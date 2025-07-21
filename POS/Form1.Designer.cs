@@ -117,6 +117,7 @@
             this.btngiris.TabIndex = 6;
             this.btngiris.Text = "Giriş";
             this.btngiris.UseVisualStyleBackColor = false;
+            this.btngiris.Click += new System.EventHandler(this.btngiris_Click);
             // 
             // btncixis
             // 
@@ -149,6 +150,7 @@
             this.Name = "Frm_login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";
+            this.Load += new System.EventHandler(this.Frm_login_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

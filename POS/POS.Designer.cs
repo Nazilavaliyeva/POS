@@ -1,6 +1,6 @@
 ﻿namespace POS
 {
-    partial class POS
+    partial class frmPOS
     {
         /// <summary>
         /// Required designer variable.
@@ -258,7 +258,7 @@
             this.label2.TabIndex = 19;
             this.label2.Text = "Kateqoriya seçin";
             // 
-            // POS
+            // frmPOS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -284,7 +284,7 @@
             this.Controls.Add(this.lblbarkod);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.lblmehsulad);
-            this.Name = "POS";
+            this.Name = "frmPOS";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "POS";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
