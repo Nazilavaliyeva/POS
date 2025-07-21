@@ -78,7 +78,7 @@
             // txtAd
             // 
             this.txtAd.Font = new System.Drawing.Font("Poor Richard", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtAd.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
+            this.txtAd.ForeColor = System.Drawing.Color.Black;
             this.txtAd.Location = new System.Drawing.Point(12, 38);
             this.txtAd.Multiline = true;
             this.txtAd.Name = "txtAd";
@@ -88,7 +88,7 @@
             // txtSoyad
             // 
             this.txtSoyad.Font = new System.Drawing.Font("Poor Richard", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSoyad.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
+            this.txtSoyad.ForeColor = System.Drawing.Color.Black;
             this.txtSoyad.Location = new System.Drawing.Point(12, 105);
             this.txtSoyad.Multiline = true;
             this.txtSoyad.Name = "txtSoyad";
@@ -98,7 +98,7 @@
             // txtSifre
             // 
             this.txtSifre.Font = new System.Drawing.Font("Poor Richard", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSifre.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
+            this.txtSifre.ForeColor = System.Drawing.Color.Black;
             this.txtSifre.Location = new System.Drawing.Point(12, 172);
             this.txtSifre.Multiline = true;
             this.txtSifre.Name = "txtSifre";
