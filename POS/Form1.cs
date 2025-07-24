@@ -31,13 +31,13 @@ namespace POS
             if(ad =="Admin" && soyad == "Admin" && parol == 123456)
             {
                 frmPOS pos = new frmPOS();
-                pos.Show(); 
+                pos.Show();
 
             }
             else
             {
                 MessageBox.Show("Məlumatları düzgün daxil edin", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }   
+            }
         }
     }
 }
