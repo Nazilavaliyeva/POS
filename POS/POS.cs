@@ -27,21 +27,25 @@ namespace POS
 
         private void SetupDataGridView()
         {
-            // DataTable üçün sütunları yaradırıq
+            productTable.Columns.Add("Barkod", typeof(string));
             productTable.Columns.Add("Ad", typeof(string));
             productTable.Columns.Add("Miqdar", typeof(int));
             productTable.Columns.Add("Alış Qiyməti", typeof(decimal));
             productTable.Columns.Add("Satış Qiyməti", typeof(decimal));
             productTable.Columns.Add("Kateqoriya", typeof(string));
+            productTable.Columns.Add("Min. Stok", typeof(int));
+            productTable.Columns.Add("Ölçü Vahidi", typeof(string));
 
-            // DataGridView-i DataTable-a bağlayırıq
             dgvProducts.DataSource = productTable;
+            dgvProducts.ReadOnly = true;
+            dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvProducts.MultiSelect = false;
+            dgvProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         private void LoadProducts()
         {
-            productTable.Clear(); // Cədvəli təmizləyirik
-
+            productTable.Clear();
             if (!File.Exists(productsFilePath)) return;
 
             try
@@ -49,10 +53,10 @@ namespace POS
                 string[] lines = File.ReadAllLines(productsFilePath);
                 foreach (string line in lines)
                 {
-                    string[] parts = line.Split(',');
-                    if (parts.Length == 5)
+                    string[] parts = line.Split('|');
+                    if (parts.Length == 11) // 11 sahə olmalıdır
                     {
-                        productTable.Rows.Add(parts[0], int.Parse(parts[1]), decimal.Parse(parts[2]), decimal.Parse(parts[3]), parts[4]);
+                        productTable.Rows.Add(parts[0], parts[1], int.Parse(parts[3]), decimal.Parse(parts[7]), decimal.Parse(parts[8]), parts[9], int.Parse(parts[4]), parts[5]);
                     }
                 }
             }
@@ -67,12 +71,10 @@ namespace POS
             try
             {
                 cmbKateqoriyaFilter.Items.Clear();
-                cmbKateqoriyaFilter.Items.Add("Bütün Kateqoriyalar"); // Filtr üçün default seçim
-
+                cmbKateqoriyaFilter.Items.Add("Bütün Kateqoriyalar");
                 if (File.Exists(categoriesFilePath))
                 {
-                    string[] categories = File.ReadAllLines(categoriesFilePath);
-                    cmbKateqoriyaFilter.Items.AddRange(categories);
+                    cmbKateqoriyaFilter.Items.AddRange(File.ReadAllLines(categoriesFilePath));
                 }
                 cmbKateqoriyaFilter.SelectedIndex = 0;
             }
@@ -84,41 +86,29 @@ namespace POS
 
         private void btnYeniMehsul_Click(object sender, EventArgs e)
         {
-            Frm_AddProduct addProductForm = new Frm_AddProduct();
-            // Yeni məhsul əlavə edildikdə cədvəli yeniləmək üçün
+            Frm_ProductDetails addProductForm = new Frm_ProductDetails();
             if (addProductForm.ShowDialog() == DialogResult.OK)
             {
-                LoadProducts(); // Cədvəli yenilə
+                LoadProducts();
             }
         }
 
         private void btnSil_Click(object sender, EventArgs e)
         {
-            // Seçilmiş sətir yoxdursa, heç nə etmə
             if (dgvProducts.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Silmək üçün bir məhsul seçin.", "Xəbərdarlıq", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // Silməni təsdiqləmək üçün soruşuruq
             if (MessageBox.Show("Seçilmiş məhsulu silməyə əminsiniz?", "Silməni Təsdiqlə", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 try
                 {
-                    // Seçilmiş sətrin adını alırıq
-                    string selectedProductName = dgvProducts.SelectedRows[0].Cells["Ad"].Value.ToString();
-
-                    // Fayldakı bütün məhsulları oxuyuruq
+                    string selectedBarcode = dgvProducts.SelectedRows[0].Cells["Barkod"].Value.ToString();
                     List<string> lines = File.ReadAllLines(productsFilePath).ToList();
-
-                    // Silinəcək məhsulu tapıb siyahıdan çıxarırıq
-                    lines.RemoveAll(line => line.Split(',')[0].Equals(selectedProductName, StringComparison.OrdinalIgnoreCase));
-
-                    // Faylı yenilənmiş siyahı ilə yenidən yazırıq
+                    lines.RemoveAll(line => line.Split('|')[0] == selectedBarcode);
                     File.WriteAllLines(productsFilePath, lines);
-
-                    // Cədvəli yeniləyirik
                     LoadProducts();
                 }
                 catch (Exception ex)
@@ -128,33 +118,63 @@ namespace POS
             }
         }
 
+        // Bu düyməni dizayna əlavə etdikdən sonra bu hadisəni yaradın
+        private void btnYenile_Click(object sender, EventArgs e)
+        {
+            if (dgvProducts.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Yeniləmək üçün bir məhsul seçin.", "Xəbərdarlıq", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                string selectedBarcode = dgvProducts.SelectedRows[0].Cells["Barkod"].Value.ToString();
+                string[] lines = File.ReadAllLines(productsFilePath);
+                string productLine = lines.FirstOrDefault(line => line.Split('|')[0] == selectedBarcode);
+
+                if (productLine != null)
+                {
+                    Frm_ProductDetails updateForm = new Frm_ProductDetails(productLine.Split('|'));
+                    if (updateForm.ShowDialog() == DialogResult.OK)
+                    {
+                        LoadProducts();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Məhsul məlumatlarını açarkən xəta baş verdi: {ex.Message}");
+            }
+        }
+
+        // DataGridView-də sətirə iki dəfə klikləməklə də redaktəni açaq
+        private void dgvProducts_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // btnYenile_Click ilə eyni məntiqi çağırırıq
+            if (e.RowIndex >= 0) // Başlıq sətrinə kliklənmədiyindən əmin oluruq
+            {
+                btnYenile_Click(sender, e);
+            }
+        }
+
         private void FilterProducts()
         {
-            string axtarisSozu = txtAxtaris.Text.ToLower();
-            string secilmisKateqoriya = cmbKateqoriyaFilter.SelectedItem.ToString();
-
-            // DataView istifadə edərək DataTable üzərində filtrasiya edirik
             DataView dv = productTable.DefaultView;
+            string filter = "";
 
-            string filterExpression = "";
-
-            // Ada görə axtarış
-            if (!string.IsNullOrEmpty(axtarisSozu))
+            if (!string.IsNullOrEmpty(txtAxtaris.Text))
             {
-                filterExpression += $"Ad LIKE '%{axtarisSozu}%'";
+                filter += $"Ad LIKE '%{txtAxtaris.Text}%'";
             }
 
-            // Kateqoriyaya görə axtarış
-            if (secilmisKateqoriya != "Bütün Kateqoriyalar")
+            if (cmbKateqoriyaFilter.SelectedIndex > 0)
             {
-                if (!string.IsNullOrEmpty(filterExpression))
-                {
-                    filterExpression += " AND ";
-                }
-                filterExpression += $"Kateqoriya = '{secilmisKateqoriya}'";
+                if (!string.IsNullOrEmpty(filter)) filter += " AND ";
+                filter += $"Kateqoriya = '{cmbKateqoriyaFilter.SelectedItem}'";
             }
 
-            dv.RowFilter = filterExpression;
+            dv.RowFilter = filter;
         }
 
         private void txtAxtaris_TextChanged(object sender, EventArgs e)

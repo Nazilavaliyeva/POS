@@ -2,8 +2,15 @@
 {
     partial class frmPOS
     {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -15,6 +22,10 @@
 
         #region Windows Form Designer generated code
 
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPOS));
@@ -25,18 +36,24 @@
             this.btnSil = new System.Windows.Forms.Button();
             this.lblKateqoriyaFilter = new System.Windows.Forms.Label();
             this.cmbKateqoriyaFilter = new System.Windows.Forms.ComboBox();
+            this.btnYenile = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducts)).BeginInit();
             this.SuspendLayout();
             // 
             // dgvProducts
             // 
+            this.dgvProducts.AllowUserToAddRows = false;
+            this.dgvProducts.AllowUserToDeleteRows = false;
             this.dgvProducts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvProducts.Location = new System.Drawing.Point(12, 59);
             this.dgvProducts.Name = "dgvProducts";
+            this.dgvProducts.ReadOnly = true;
             this.dgvProducts.RowHeadersWidth = 51;
             this.dgvProducts.RowTemplate.Height = 24;
+            this.dgvProducts.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvProducts.Size = new System.Drawing.Size(776, 339);
             this.dgvProducts.TabIndex = 0;
+            this.dgvProducts.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProducts_CellDoubleClick);
             // 
             // lblAxtaris
             // 
@@ -106,11 +123,26 @@
             this.cmbKateqoriyaFilter.TabIndex = 6;
             this.cmbKateqoriyaFilter.SelectedIndexChanged += new System.EventHandler(this.cmbKateqoriyaFilter_SelectedIndexChanged);
             // 
+            // btnYenile
+            // 
+            this.btnYenile.BackColor = System.Drawing.Color.DodgerBlue;
+            this.btnYenile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnYenile.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnYenile.ForeColor = System.Drawing.Color.White;
+            this.btnYenile.Location = new System.Drawing.Point(382, 415);
+            this.btnYenile.Name = "btnYenile";
+            this.btnYenile.Size = new System.Drawing.Size(132, 40);
+            this.btnYenile.TabIndex = 7;
+            this.btnYenile.Text = "Yenilə";
+            this.btnYenile.UseVisualStyleBackColor = false;
+            this.btnYenile.Click += new System.EventHandler(this.btnYenile_Click);
+            // 
             // frmPOS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 471);
+            this.Controls.Add(this.btnYenile);
             this.Controls.Add(this.cmbKateqoriyaFilter);
             this.Controls.Add(this.lblKateqoriyaFilter);
             this.Controls.Add(this.btnSil);
@@ -126,6 +158,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducts)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -137,5 +170,6 @@
         private System.Windows.Forms.Button btnSil;
         private System.Windows.Forms.Label lblKateqoriyaFilter;
         private System.Windows.Forms.ComboBox cmbKateqoriyaFilter;
+        private System.Windows.Forms.Button btnYenile;
     }
 }
