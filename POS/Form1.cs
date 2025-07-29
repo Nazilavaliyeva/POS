@@ -25,19 +25,11 @@ namespace POS
 
         private void btngiris_Click(object sender, EventArgs e)
         {
-            string ad = "Admin";
-            string soyad = "Admin";
-            int parol = 123456;
-            if(ad =="Admin" && soyad == "Admin" && parol == 123456)
-            {
-                frmPOS pos = new frmPOS();
-                pos.Show();
+            // Burada giriş məlumatlarını yoxlayırıq    
+            string ad = txtAd.Text;
+            string soyad = txtSoyad.Text;
+            string sifre = txtSifre.Text;
 
-            }
-            else
-            {
-                MessageBox.Show("Məlumatları düzgün daxil edin", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
     }
 }
