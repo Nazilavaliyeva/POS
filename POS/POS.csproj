@@ -52,11 +52,23 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Frm_Categories.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_Categories.Designer.cs">
+      <DependentUpon>Frm_Categories.cs</DependentUpon>
+    </Compile>
     <Compile Include="Frm_ProductDetails.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Frm_ProductDetails.Designer.cs">
       <DependentUpon>Frm_ProductDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frm_Receipt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frm_Receipt.Designer.cs">
+      <DependentUpon>Frm_Receipt.cs</DependentUpon>
     </Compile>
     <Compile Include="Frm_Register.cs">
       <SubType>Form</SubType>

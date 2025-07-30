@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing; // Rəng istifadəsi üçün əlavə edildi
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,12 +10,10 @@ namespace POS
 {
     public partial class frmPOS : Form
     {
-        // Faylların yolları
         private readonly string productsFilePath = "products.txt";
         private readonly string categoriesFilePath = "categories.txt";
         private readonly string salesFilePath = "sales.txt";
 
-        // Məlumatları saxlamaq üçün DataTable-lar
         private DataTable productTable = new DataTable();
         private DataTable basketTable = new DataTable();
 
@@ -31,7 +29,7 @@ namespace POS
             LoadCategoriesFilter();
         }
 
-        // Bu metod designer.cs faylındakı xətanı aradan qaldırmaq üçün əlavə edilib.
+        // Bu metod designer.cs faylındakı köhnə referansdan qalan potensial xətanı aradan qaldırmaq üçündür.
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
             // Bu metod artıq istifadə edilmir.
@@ -39,13 +37,11 @@ namespace POS
 
         private void SetupDataTables()
         {
-            // Məhsul cədvəlinin sütunları
             productTable.Columns.Add("Barkod", typeof(string));
             productTable.Columns.Add("Ad", typeof(string));
             productTable.Columns.Add("Miqdar", typeof(int));
             productTable.Columns.Add("Satış Qiyməti", typeof(decimal));
             productTable.Columns.Add("Kateqoriya", typeof(string));
-            // YENİLƏMƏ: Minimum stok səviyyəsini yoxlamaq üçün bu sütun əlavə edildi
             productTable.Columns.Add("Min. Stok", typeof(int));
 
             dgvProducts.DataSource = productTable;
@@ -53,12 +49,8 @@ namespace POS
             dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvProducts.MultiSelect = false;
             dgvProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            // YENİLƏMƏ: Cədvəl yükləndikdən sonra rəngləməni tətbiq etmək üçün hadisə (event) əlavə edildi
             dgvProducts.DataBindingComplete += dgvProducts_DataBindingComplete;
 
-
-            // Səbət cədvəlinin sütunları
             basketTable.Columns.Add("Barkod", typeof(string));
             basketTable.Columns.Add("Ad", typeof(string));
             basketTable.Columns.Add("Miqdar", typeof(int));
@@ -84,7 +76,6 @@ namespace POS
                     string[] parts = line.Split('|');
                     if (parts.Length == 11)
                     {
-                        // YENİLƏMƏ: Minimum stok (parts[4]) dəyərini də cədvələ əlavə edirik
                         productTable.Rows.Add(parts[0], parts[1], int.Parse(parts[3]), decimal.Parse(parts[8]), parts[9], int.Parse(parts[4]));
                     }
                 }
@@ -95,31 +86,27 @@ namespace POS
             }
         }
 
-        // YENİ METOD: Minimum stok səviyyəsinə nəzarət və sətirlərin rənglənməsi
         private void dgvProducts_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             foreach (DataGridViewRow row in dgvProducts.Rows)
             {
-                // Miqdar və Min. Stok dəyərlərini alırıq
+                if (row.Cells["Miqdar"].Value == null || row.Cells["Min. Stok"].Value == null) continue;
+
                 int miqdar = Convert.ToInt32(row.Cells["Miqdar"].Value);
                 int minStok = Convert.ToInt32(row.Cells["Min. Stok"].Value);
 
-                // Şərti yoxlayırıq
                 if (miqdar <= minStok)
                 {
-                    // Əgər miqdar azdırsa, sətrin arxa fonunu açıq qırmızı rəngə boyayırıq
                     row.DefaultCellStyle.BackColor = Color.LightCoral;
                     row.DefaultCellStyle.ForeColor = Color.White;
                 }
                 else
                 {
-                    // Şərt ödənmirsə, rəngi standart rəngə qaytarırıq
                     row.DefaultCellStyle.BackColor = SystemColors.Window;
                     row.DefaultCellStyle.ForeColor = SystemColors.ControlText;
                 }
             }
         }
-
 
         private void LoadCategoriesFilter()
         {
@@ -150,17 +137,16 @@ namespace POS
 
         private void btnYenile_Click(object sender, EventArgs e)
         {
-            if (dgvProducts.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Yeniləmək üçün bir məhsul seçin.", "Xəbərdarlıq", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
             EditSelectedProduct();
         }
 
         private void EditSelectedProduct()
         {
-            if (dgvProducts.SelectedRows.Count == 0) return;
+            if (dgvProducts.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Yeniləmək üçün bir məhsul seçin.", "Xəbərdarlıq", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             try
             {
@@ -253,6 +239,16 @@ namespace POS
             reportsForm.ShowDialog();
         }
 
+        private void btnKateqoriyalar_Click(object sender, EventArgs e)
+        {
+            Frm_Categories categoriesForm = new Frm_Categories();
+            if (categoriesForm.ShowDialog() == DialogResult.OK)
+            {
+                LoadCategoriesFilter();
+                LoadProducts();
+            }
+        }
+
         private void AddToBasket(string barkod)
         {
             DataRow productRow = productTable.Select($"Barkod = '{barkod}'").FirstOrDefault();
@@ -316,9 +312,10 @@ namespace POS
                 List<string> productLines = File.ReadAllLines(productsFilePath).ToList();
                 string salesRecord = "";
 
-                string transactionId = Guid.NewGuid().ToString();
+                string transactionId = Guid.NewGuid().ToString().Substring(0, 8); // Qısa və unikal satış ID-si
                 DateTime saleDate = DateTime.Now;
 
+                // Səbətdəki hər məhsul üçün stoku azaldırıq
                 foreach (DataRow row in basketTable.Rows)
                 {
                     string barkod = row["Barkod"].ToString();
@@ -332,15 +329,22 @@ namespace POS
                         parts[3] = yeniMiqdar.ToString();
                         productLines[index] = string.Join("|", parts);
                     }
+                    // Satışın qeydini hazırlayırıq
                     salesRecord += $"{transactionId}|{saleDate:yyyy-MM-dd HH:mm:ss}|{row["Ad"]}|{satilanMiqdar}|{row["Qiymət"]}{Environment.NewLine}";
                 }
 
                 File.WriteAllLines(productsFilePath, productLines);
-
                 File.AppendAllText(salesFilePath, salesRecord);
 
                 MessageBox.Show("Satış uğurla tamamlandı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                // --- YENİ ƏLAVƏ EDİLƏN HİSSƏ ---
+                // Qəbz pəncərəsini yaradırıq və səbətdəki məlumatlarla birlikdə göstəririk
+                Frm_Receipt receiptForm = new Frm_Receipt(transactionId, saleDate, basketTable);
+                receiptForm.ShowDialog();
+                // --- YENİLƏMƏNİN SONU ---
+
+                // Səbəti təmizləyirik və məhsul siyahısını yeniləyirik
                 basketTable.Clear();
                 UpdateTotal();
                 LoadProducts();

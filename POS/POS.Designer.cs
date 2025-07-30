@@ -46,6 +46,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.btnHesabatlar = new System.Windows.Forms.Button();
+            this.btnKateqoriyalar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBasket)).BeginInit();
             this.panel1.SuspendLayout();
@@ -255,11 +256,26 @@
             this.btnHesabatlar.UseVisualStyleBackColor = false;
             this.btnHesabatlar.Click += new System.EventHandler(this.btnHesabatlar_Click);
             // 
+            // btnKateqoriyalar
+            // 
+            this.btnKateqoriyalar.BackColor = System.Drawing.Color.Indigo;
+            this.btnKateqoriyalar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnKateqoriyalar.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnKateqoriyalar.ForeColor = System.Drawing.Color.White;
+            this.btnKateqoriyalar.Location = new System.Drawing.Point(424, 571);
+            this.btnKateqoriyalar.Name = "btnKateqoriyalar";
+            this.btnKateqoriyalar.Size = new System.Drawing.Size(148, 40);
+            this.btnKateqoriyalar.TabIndex = 15;
+            this.btnKateqoriyalar.Text = "Kateqoriyalar";
+            this.btnKateqoriyalar.UseVisualStyleBackColor = false;
+            this.btnKateqoriyalar.Click += new System.EventHandler(this.btnKateqoriyalar_Click);
+            // 
             // frmPOS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1102, 623);
+            this.Controls.Add(this.btnKateqoriyalar);
             this.Controls.Add(this.btnHesabatlar);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -308,5 +324,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnHesabatlar;
+        private System.Windows.Forms.Button btnKateqoriyalar;
     }
 }
