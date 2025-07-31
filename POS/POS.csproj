@@ -82,11 +82,11 @@
     <Compile Include="Frm_Reports.Designer.cs">
       <DependentUpon>Frm_Reports.cs</DependentUpon>
     </Compile>
-    <Compile Include="Hesabatlar.cs">
+    <Compile Include="Frm_ReturnProduct.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Hesabatlar.Designer.cs">
-      <DependentUpon>Hesabatlar.cs</DependentUpon>
+    <Compile Include="Frm_ReturnProduct.Designer.cs">
+      <DependentUpon>Frm_ReturnProduct.cs</DependentUpon>
     </Compile>
     <Compile Include="POS.cs">
       <SubType>Form</SubType>

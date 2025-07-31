@@ -30,6 +30,7 @@ namespace POS
         }
 
         // Bu metod designer.cs faylındakı köhnə referansdan qalan potensial xətanı aradan qaldırmaq üçündür.
+        // Artıq istifadə edilmədiyi üçün içi boşdur.
         private void textBox4_TextChanged(object sender, EventArgs e)
         {
             // Bu metod artıq istifadə edilmir.
@@ -299,6 +300,7 @@ namespace POS
             UpdateTotal();
         }
 
+        // POS.cs faylında bu metodu yeniləyin
         private void btnSatisEt_Click(object sender, EventArgs e)
         {
             if (basketTable.Rows.Count == 0)
@@ -312,10 +314,9 @@ namespace POS
                 List<string> productLines = File.ReadAllLines(productsFilePath).ToList();
                 string salesRecord = "";
 
-                string transactionId = Guid.NewGuid().ToString().Substring(0, 8); // Qısa və unikal satış ID-si
+                string transactionId = Guid.NewGuid().ToString().Substring(0, 8);
                 DateTime saleDate = DateTime.Now;
 
-                // Səbətdəki hər məhsul üçün stoku azaldırıq
                 foreach (DataRow row in basketTable.Rows)
                 {
                     string barkod = row["Barkod"].ToString();
@@ -329,8 +330,8 @@ namespace POS
                         parts[3] = yeniMiqdar.ToString();
                         productLines[index] = string.Join("|", parts);
                     }
-                    // Satışın qeydini hazırlayırıq
-                    salesRecord += $"{transactionId}|{saleDate:yyyy-MM-dd HH:mm:ss}|{row["Ad"]}|{satilanMiqdar}|{row["Qiymət"]}{Environment.NewLine}";
+                    // YENİLƏMƏ: Satış qeydinə BARKOD da əlavə edildi (yeni format)
+                    salesRecord += $"{transactionId}|{saleDate:yyyy-MM-dd HH:mm:ss}|{barkod}|{row["Ad"]}|{satilanMiqdar}|{row["Qiymət"]}{Environment.NewLine}";
                 }
 
                 File.WriteAllLines(productsFilePath, productLines);
@@ -338,13 +339,9 @@ namespace POS
 
                 MessageBox.Show("Satış uğurla tamamlandı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // --- YENİ ƏLAVƏ EDİLƏN HİSSƏ ---
-                // Qəbz pəncərəsini yaradırıq və səbətdəki məlumatlarla birlikdə göstəririk
                 Frm_Receipt receiptForm = new Frm_Receipt(transactionId, saleDate, basketTable);
                 receiptForm.ShowDialog();
-                // --- YENİLƏMƏNİN SONU ---
 
-                // Səbəti təmizləyirik və məhsul siyahısını yeniləyirik
                 basketTable.Clear();
                 UpdateTotal();
                 LoadProducts();
