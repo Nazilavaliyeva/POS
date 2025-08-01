@@ -67,9 +67,11 @@ namespace POS
                 var encryptedLines = File.ReadAllLines(productsFilePath);
                 foreach (var encryptedLine in encryptedLines)
                 {
+                    if (string.IsNullOrWhiteSpace(encryptedLine)) continue;
+
                     string line = EncryptionHelper.Decrypt(encryptedLine);
                     string[] parts = line.Split('|');
-                    if (parts.Length == 11)
+                    if (parts.Length == 11) // Format yoxlaması
                     {
                         productTable.Rows.Add(parts[0], parts[1], int.Parse(parts[3]), decimal.Parse(parts[8]), parts[9], int.Parse(parts[4]));
                     }
@@ -125,10 +127,12 @@ namespace POS
 
         private void btnYeniMehsul_Click(object sender, EventArgs e)
         {
-            Frm_ProductDetails addProductForm = new Frm_ProductDetails();
-            if (addProductForm.ShowDialog() == DialogResult.OK)
+            using (Frm_ProductDetails addProductForm = new Frm_ProductDetails())
             {
-                LoadProducts();
+                if (addProductForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadProducts();
+                }
             }
         }
 
@@ -154,10 +158,13 @@ namespace POS
 
                 if (encryptedProductLine != null)
                 {
-                    Frm_ProductDetails updateForm = new Frm_ProductDetails(EncryptionHelper.Decrypt(encryptedProductLine).Split('|'));
-                    if (updateForm.ShowDialog() == DialogResult.OK)
+                    using (Frm_ProductDetails updateForm = new Frm_ProductDetails(EncryptionHelper.Decrypt(encryptedProductLine).Split('|')))
                     {
-                        LoadProducts();
+                        if (updateForm.ShowDialog() == DialogResult.OK)
+                        {
+                            LoadProducts();
+                            FilterProducts(); // DÜZƏLİŞ: Redaktədən sonra filtri yeniləyirik.
+                        }
                     }
                 }
             }
@@ -198,8 +205,8 @@ namespace POS
         {
             if (e.RowIndex >= 0)
             {
-                DataRowView selectedRow = (DataRowView)dgvProducts.Rows[e.RowIndex].DataBoundItem;
-                string barkod = selectedRow["Barkod"].ToString();
+                DataGridViewRow row = dgvProducts.Rows[e.RowIndex];
+                string barkod = row.Cells["Barkod"].Value.ToString();
                 AddToBasket(barkod);
             }
         }
@@ -211,13 +218,17 @@ namespace POS
 
             if (!string.IsNullOrEmpty(txtAxtaris.Text))
             {
-                filter += $"Ad LIKE '%{txtAxtaris.Text}%'";
+                // DÜZƏLİŞ: Xüsusi simvollardan qaçmaq üçün.
+                string safeSearch = txtAxtaris.Text.Replace("'", "''");
+                filter += $"Ad LIKE '%{safeSearch}%'";
             }
 
             if (cmbKateqoriyaFilter.SelectedIndex > 0)
             {
                 if (!string.IsNullOrEmpty(filter)) filter += " AND ";
-                filter += $"Kateqoriya = '{cmbKateqoriyaFilter.SelectedItem}'";
+                // DÜZƏLİŞ: Xüsusi simvollardan qaçmaq üçün.
+                string safeCategory = cmbKateqoriyaFilter.SelectedItem.ToString().Replace("'", "''");
+                filter += $"Kateqoriya = '{safeCategory}'";
             }
 
             dv.RowFilter = filter;
@@ -235,38 +246,47 @@ namespace POS
 
         private void btnHesabatlar_Click(object sender, EventArgs e)
         {
-            Frm_Reports reportsForm = new Frm_Reports();
-            reportsForm.ShowDialog();
+            using (Frm_Reports reportsForm = new Frm_Reports())
+            {
+                reportsForm.ShowDialog();
+            }
         }
 
         private void btnKateqoriyalar_Click(object sender, EventArgs e)
         {
-            Frm_Categories categoriesForm = new Frm_Categories();
-            if (categoriesForm.ShowDialog() == DialogResult.OK)
+            using (Frm_Categories categoriesForm = new Frm_Categories())
             {
-                LoadCategoriesFilter();
-                LoadProducts();
+                if (categoriesForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadCategoriesFilter();
+                    LoadProducts();
+                }
             }
         }
 
+        // DÜZƏLİŞ: Frm_ReturnProduct formunu açmaq üçün event handler əlavə edildi
         private void btnGeriQaytarma_Click(object sender, EventArgs e)
         {
-            Frm_ReturnProduct returnForm = new Frm_ReturnProduct();
-            if (returnForm.ShowDialog() == DialogResult.OK)
+            using (Frm_ReturnProduct returnForm = new Frm_ReturnProduct())
             {
-                LoadProducts();
+                if (returnForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadProducts();
+                }
             }
         }
+
 
         private void AddToBasket(string barkod)
         {
-            DataRow productRow = productTable.Select($"Barkod = '{barkod}'").FirstOrDefault();
+            DataRow productRow = productTable.AsEnumerable().FirstOrDefault(r => r.Field<string>("Barkod") == barkod);
+
             if (productRow == null) return;
 
-            int anbarMiqdari = (int)productRow["Miqdar"];
+            int anbarMiqdari = productRow.Field<int>("Miqdar");
             if (anbarMiqdari <= 0)
             {
-                MessageBox.Show("Bu məhsul anbarada bitib.", "Stok Xətası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Bu məhsul anbarda bitib.", "Stok Xətası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -297,7 +317,11 @@ namespace POS
             decimal yekunMebleg = 0;
             if (basketTable.Rows.Count > 0)
             {
-                yekunMebleg = (decimal)basketTable.Compute("SUM(Toplam)", string.Empty);
+                object sumObject = basketTable.Compute("SUM(Toplam)", string.Empty);
+                if (sumObject != DBNull.Value)
+                {
+                    yekunMebleg = Convert.ToDecimal(sumObject);
+                }
             }
             lblYekunMebleg.Text = $"{yekunMebleg:F2} ₼";
         }
@@ -349,8 +373,10 @@ namespace POS
 
                 MessageBox.Show("Satış uğurla tamamlandı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                Frm_Receipt receiptForm = new Frm_Receipt(transactionId, saleDate, basketTable);
-                receiptForm.ShowDialog();
+                using (Frm_Receipt receiptForm = new Frm_Receipt(transactionId, saleDate, basketTable.Copy()))
+                {
+                    receiptForm.ShowDialog();
+                }
 
                 basketTable.Clear();
                 UpdateTotal();

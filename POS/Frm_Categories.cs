@@ -29,7 +29,11 @@ namespace POS
                 var encryptedLines = File.ReadAllLines(categoriesFilePath);
                 foreach (var encryptedLine in encryptedLines)
                 {
-                    lstCategories.Items.Add(EncryptionHelper.Decrypt(encryptedLine));
+                    // Boş sətirləri nəzərə almamaq üçün
+                    if (!string.IsNullOrWhiteSpace(encryptedLine))
+                    {
+                        lstCategories.Items.Add(EncryptionHelper.Decrypt(encryptedLine));
+                    }
                 }
             }
         }
@@ -120,6 +124,7 @@ namespace POS
             for (int i = 0; i < decryptedLines.Count; i++)
             {
                 string[] parts = decryptedLines[i].Split('|');
+                // DÜZƏLİŞ: Məhsul sətrinin formatını yoxlayırıq.
                 if (parts.Length == 11 && parts[9] == oldCategory)
                 {
                     parts[9] = newCategory;
@@ -135,7 +140,6 @@ namespace POS
             }
         }
 
-
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (lstCategories.SelectedItem == null)
@@ -148,9 +152,12 @@ namespace POS
 
             if (File.Exists(productsFilePath))
             {
+                // DÜZƏLİŞ: Məhsul sətrinin formatını yoxlayırıq.
                 bool isUsed = File.ReadAllLines(productsFilePath)
                                   .Select(line => EncryptionHelper.Decrypt(line))
-                                  .Any(decryptedLine => decryptedLine.Split('|').Length == 11 && decryptedLine.Split('|')[9] == categoryToDelete);
+                                  .Any(decryptedLine =>
+                                       decryptedLine.Split('|').Length == 11 &&
+                                       decryptedLine.Split('|')[9] == categoryToDelete);
                 if (isUsed)
                 {
                     MessageBox.Show("Bu kateqoriya məhsullarda istifadə edildiyi üçün silinə bilməz.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);

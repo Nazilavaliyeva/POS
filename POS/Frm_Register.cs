@@ -39,8 +39,14 @@ namespace POS
                     var lines = File.ReadAllLines(usersFilePath);
                     foreach (var encryptedLine in lines)
                     {
+                        // DÜZƏLİŞ: Boş sətirləri nəzərə almamaq üçün yoxlama.
+                        if (string.IsNullOrWhiteSpace(encryptedLine)) continue;
+
                         var decryptedLine = EncryptionHelper.Decrypt(encryptedLine);
-                        if (decryptedLine.Split(',')[0].Equals(istifadeciAdi, StringComparison.OrdinalIgnoreCase))
+                        string[] parts = decryptedLine.Split(',');
+
+                        // DÜZƏLİŞ: Fayldakı sətrin düzgün formatda olub-olmadığını yoxlayırıq.
+                        if (parts.Length > 0 && parts[0].Equals(istifadeciAdi, StringComparison.OrdinalIgnoreCase))
                         {
                             MessageBox.Show("Bu istifadəçi adı artıq mövcuddur.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
@@ -51,11 +57,11 @@ namespace POS
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(sifre);
                 string userInfo = $"{istifadeciAdi},{hashedPassword}";
 
-                // Məlumatı şifrələyib fayla yazırıq
                 string encryptedUserInfo = EncryptionHelper.Encrypt(userInfo);
                 File.AppendAllText(usersFilePath, encryptedUserInfo + Environment.NewLine);
 
                 MessageBox.Show("Qeydiyyat uğurla tamamlandı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.DialogResult = DialogResult.OK; // DİALOGRESULT SET EDİLDİ
                 this.Close();
             }
             catch (Exception ex)

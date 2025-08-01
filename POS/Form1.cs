@@ -29,7 +29,7 @@ namespace POS
 
             if (!File.Exists(usersFilePath))
             {
-                MessageBox.Show("Qeydiyyatdan keçmiş istifadəçi tapılmadı.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Qeydiyyatdan keçmiş istifadəçi tapılmadı. Zəhmət olmasa qeydiyyatdan keçin.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -39,17 +39,21 @@ namespace POS
                 var encryptedLines = File.ReadAllLines(usersFilePath);
                 foreach (var encryptedLine in encryptedLines)
                 {
-                    // Hər sətri deşifrələyirik
+                    // DÜZƏLİŞ: Boş sətirləri nəzərə almamaq üçün yoxlama.
+                    if (string.IsNullOrWhiteSpace(encryptedLine)) continue;
+
                     string decryptedLine = EncryptionHelper.Decrypt(encryptedLine);
                     string[] userCredentials = decryptedLine.Split(',');
 
-                    if (userCredentials[0].Equals(ad, StringComparison.OrdinalIgnoreCase))
+                    // DÜZƏLİŞ: Fayldakı sətrin düzgün formatda (ad,şifrə) olub-olmadığını yoxlayırıq.
+                    // Bu, proqramın "IndexOutOfRangeException" xətası verərək çökməsinin qarşısını alır.
+                    if (userCredentials.Length == 2 && userCredentials[0].Equals(ad, StringComparison.OrdinalIgnoreCase))
                     {
                         string savedHashedPassword = userCredentials[1];
                         if (BCrypt.Net.BCrypt.Verify(sifre, savedHashedPassword))
                         {
                             girisUqurlu = true;
-                            break;
+                            break; // Düzgün istifadəçi tapıldı, döngüdən çıxırıq.
                         }
                     }
                 }

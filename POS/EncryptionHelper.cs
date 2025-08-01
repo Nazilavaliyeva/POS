@@ -6,8 +6,11 @@ using System.Text;
 public static class EncryptionHelper
 {
     // DİQQƏT: Real layihədə bu açarlar heç vaxt kodda saxlanmamalıdır!
-    private static readonly byte[] Key = Encoding.UTF8.GetBytes("Bu32ByteUzunluqluBirAcardir1234"); // 32 byte (256-bit) olmalıdır
-    private static readonly byte[] IV = Encoding.UTF8.GetBytes("Bu16ByteIVdir123");              // 16 byte (128-bit) olmalıdır
+
+    // DÜZƏLİŞ: Açarın uzunluğu 31 bayt idi, 32 bayta tamamlandı (sonuna '5' əlavə edildi).
+    // AES alqoritmi üçün açar mütləq 16, 24 və ya 32 bayt olmalıdır.
+    private static readonly byte[] Key = Encoding.UTF8.GetBytes("Bu32ByteUzunluqluBirAcardir12345"); // 32 byte (256-bit)
+    private static readonly byte[] IV = Encoding.UTF8.GetBytes("Bu16ByteIVdir123");              // 16 byte (128-bit)
 
     public static string Encrypt(string plainText)
     {
@@ -65,6 +68,13 @@ public static class EncryptionHelper
         catch (FormatException)
         {
             // Əgər məlumat şifrələnməyibsə (köhnə fayldırsa), olduğu kimi qaytar
+            return cipherText;
+        }
+        catch (CryptographicException)
+        {
+            // DÜZƏLİŞ: Yanlış açar və ya pozulmuş data ilə deşifrələməyə çalışanda xəta baş verərsə,
+            // proqramın çökmeməsi üçün xətanı tuturuq.
+            // Bu halda, orijinal şifrəli mətni qaytarmaq daha təhlükəsizdir.
             return cipherText;
         }
     }

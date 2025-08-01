@@ -35,7 +35,7 @@
             this.lblad.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.lblad.Location = new System.Drawing.Point(28, 79);
             this.lblad.Name = "lblad";
-            this.lblad.Size = new System.Drawing.Size(111, 23);
+            this.lblad.Size = new System.Drawing.Size(107, 23);
             this.lblad.TabIndex = 0;
             this.lblad.Text = "İstifadəçi Adı";
             // 
@@ -46,7 +46,7 @@
             this.lblsifre.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.lblsifre.Location = new System.Drawing.Point(28, 155);
             this.lblsifre.Name = "lblsifre";
-            this.lblsifre.Size = new System.Drawing.Size(45, 23);
+            this.lblsifre.Size = new System.Drawing.Size(43, 23);
             this.lblsifre.TabIndex = 2;
             this.lblsifre.Text = "Şifrə";
             // 
@@ -121,7 +121,7 @@
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.label1.Location = new System.Drawing.Point(54, 21);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(217, 38);
+            this.label1.Size = new System.Drawing.Size(232, 38);
             this.label1.TabIndex = 6;
             this.label1.Text = "Sistemə Daxil Ol";
             // 
