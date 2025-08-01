@@ -2,14 +2,13 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Configuration; // Bu sətirin olduğundan əmin olun
+using System.Configuration;
 
 public static class EncryptionHelper
 {
     private static readonly byte[] Key;
     private static readonly byte[] IV;
 
-    // DƏYİŞİKLİK: Açarları oxumaq və yoxlamaq üçün static constructor əlavə edildi
     static EncryptionHelper()
     {
         string keyString = ConfigurationManager.AppSettings["EncryptionKey"];
@@ -27,7 +26,6 @@ public static class EncryptionHelper
         Key = Encoding.UTF8.GetBytes(keyString);
         IV = Encoding.UTF8.GetBytes(ivString);
 
-        // Təhlükəsizlik üçün yoxlama: Açarın və Vektorun uzunluğunu yoxlayırıq.
         if (Key.Length != 32)
         {
             throw new ConfigurationErrorsException("'EncryptionKey' dəyəri App.config faylında 32 simvol olmalıdır.");
@@ -38,6 +36,7 @@ public static class EncryptionHelper
         }
     }
 
+    // --- BU METODLARI GERİ QAYTARIRIQ ---
     public static string Encrypt(string plainText)
     {
         if (string.IsNullOrEmpty(plainText))
@@ -91,13 +90,7 @@ public static class EncryptionHelper
                 }
             }
         }
-        catch (FormatException)
-        {
-            return cipherText;
-        }
-        catch (CryptographicException)
-        {
-            return cipherText;
-        }
+        catch (FormatException) { return cipherText; }
+        catch (CryptographicException) { return cipherText; }
     }
 }
