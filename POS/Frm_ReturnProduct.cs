@@ -48,7 +48,8 @@ namespace POS
             }
 
             var saleLines = File.ReadAllLines(salesFilePath)
-                                .Where(line => line.Split('|')[0].Equals(satisID, StringComparison.OrdinalIgnoreCase))
+                                .Select(line => EncryptionHelper.Decrypt(line))
+                                .Where(decryptedLine => decryptedLine.Split('|')[0].Equals(satisID, StringComparison.OrdinalIgnoreCase))
                                 .ToList();
 
             if (saleLines.Count == 0)
@@ -92,15 +93,19 @@ namespace POS
             {
                 try
                 {
-                    // 1. Məhsulun stokunu artırırıq (barkoda görə)
-                    List<string> productLines = File.ReadAllLines(productsFilePath).ToList();
-                    int index = productLines.FindIndex(line => line.Split('|')[0].Equals(barkod, StringComparison.OrdinalIgnoreCase));
+                    // 1. Update product stock
+                    var encryptedProductLines = File.ReadAllLines(productsFilePath).ToList();
+                    var decryptedProductLines = encryptedProductLines.Select(line => EncryptionHelper.Decrypt(line)).ToList();
+
+                    int index = decryptedProductLines.FindIndex(line => line.Split('|')[0].Equals(barkod, StringComparison.OrdinalIgnoreCase));
                     if (index != -1)
                     {
-                        string[] parts = productLines[index].Split('|');
-                        parts[3] = (int.Parse(parts[3]) + qaytarilanMiqdar).ToString(); // Miqdarı artırırıq
-                        productLines[index] = string.Join("|", parts);
-                        File.WriteAllLines(productsFilePath, productLines);
+                        string[] parts = decryptedProductLines[index].Split('|');
+                        parts[3] = (int.Parse(parts[3]) + qaytarilanMiqdar).ToString(); // Increase quantity
+                        decryptedProductLines[index] = string.Join("|", parts);
+
+                        var reEncryptedProductLines = decryptedProductLines.Select(line => EncryptionHelper.Encrypt(line));
+                        File.WriteAllLines(productsFilePath, reEncryptedProductLines);
                     }
                     else
                     {
@@ -108,13 +113,14 @@ namespace POS
                         return;
                     }
 
-                    // 2. Qaytarılma qeydi yaradırıq
+                    // 2. Create a return record
                     string returnRecord = $"{txtSatisID.Text.Trim()}|{DateTime.Now:yyyy-MM-dd HH:mm:ss}|{barkod}|{mehsulAdi}|{qaytarilanMiqdar}";
-                    File.AppendAllText(returnsFilePath, returnRecord + Environment.NewLine);
+                    string encryptedReturnRecord = EncryptionHelper.Encrypt(returnRecord);
+                    File.AppendAllText(returnsFilePath, encryptedReturnRecord + Environment.NewLine);
 
                     MessageBox.Show("Məhsul uğurla geri qaytarıldı və stok yeniləndi.", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    this.DialogResult = DialogResult.OK; // Ana formanın məhsul siyahısını yeniləməsi üçün
+                    this.DialogResult = DialogResult.OK; // To refresh the main form's product list
                     this.Close();
                 }
                 catch (Exception ex)

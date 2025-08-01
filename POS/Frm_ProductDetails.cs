@@ -12,11 +12,9 @@ namespace POS
         private readonly string categoriesFilePath = "categories.txt";
         private readonly string imagesFolderPath = "images";
 
-        // Redaktə rejimi üçün məhsulun orijinal barkodunu saxlayır
         private readonly string originalBarcode;
         public bool IsEditMode { get; private set; }
 
-        // Yeni məhsul əlavə etmək üçün konstruktor
         public Frm_ProductDetails()
         {
             InitializeComponent();
@@ -24,14 +22,12 @@ namespace POS
             this.Text = "Yeni Məhsul Əlavə Et";
         }
 
-        // Məhsulu redaktə etmək üçün konstruktor
         public Frm_ProductDetails(string[] productData)
         {
             InitializeComponent();
             IsEditMode = true;
             this.Text = "Məhsulu Redaktə Et";
 
-            // Mövcud məlumatları formadakı sahələrə doldururuq
             originalBarcode = productData[0];
             txtBarkod.Text = productData[0];
             txtMehsulAd.Text = productData[1];
@@ -44,7 +40,6 @@ namespace POS
             txtSatisQiymeti.Text = productData[8];
             cmbKateqoriya.SelectedItem = productData[9];
 
-            // Şəkli yükləyirik
             string imagePath = productData[10];
             if (File.Exists(imagePath))
             {
@@ -68,12 +63,15 @@ namespace POS
             {
                 if (File.Exists(categoriesFilePath))
                 {
-                    cmbKateqoriya.Items.AddRange(File.ReadAllLines(categoriesFilePath));
+                    var encryptedLines = File.ReadAllLines(categoriesFilePath);
+                    var decryptedLines = encryptedLines.Select(line => EncryptionHelper.Decrypt(line));
+                    cmbKateqoriya.Items.AddRange(decryptedLines.ToArray());
                 }
                 else
                 {
                     string[] defaultCategories = { "İçkilər", "Şirniyyat", "Qida" };
-                    File.WriteAllLines(categoriesFilePath, defaultCategories);
+                    var encryptedCategories = defaultCategories.Select(c => EncryptionHelper.Encrypt(c));
+                    File.WriteAllLines(categoriesFilePath, encryptedCategories);
                     cmbKateqoriya.Items.AddRange(defaultCategories);
                 }
             }
@@ -95,7 +93,6 @@ namespace POS
 
         private void btnYaddaSaxla_Click(object sender, EventArgs e)
         {
-            // Validasiya
             if (string.IsNullOrWhiteSpace(txtBarkod.Text) ||
                 string.IsNullOrWhiteSpace(txtMehsulAd.Text) ||
                 !decimal.TryParse(txtAlisQiymeti.Text, out _) ||
@@ -105,71 +102,67 @@ namespace POS
                 return;
             }
 
-            // Şəklin yadda saxlanması
             string imagePath = picMehsulSekli.ImageLocation;
             if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
             {
-                // Şəkillər üçün qovluq mövcud deyilsə yaradırıq
                 if (!Directory.Exists(imagesFolderPath))
                 {
                     Directory.CreateDirectory(imagesFolderPath);
                 }
                 string newFileName = Guid.NewGuid().ToString() + Path.GetExtension(imagePath);
                 string newPath = Path.Combine(imagesFolderPath, newFileName);
-                File.Copy(imagePath, newPath);
-                imagePath = newPath; // Yeni yolu mənimsədirik
+                File.Copy(imagePath, newPath, true);
+                imagePath = newPath;
             }
             else
             {
-                imagePath = "N/A"; // Şəkil yoxdursa
+                imagePath = "N/A";
             }
 
-
-            // Məlumatları formatlaşdırırıq
             string productInfo = string.Join("|",
-                txtBarkod.Text,
-                txtMehsulAd.Text,
-                txtTevsir.Text,
-                numMiqdar.Value,
-                numMinStok.Value,
-                cmbOlcuVahidi.SelectedItem,
+                txtBarkod.Text, txtMehsulAd.Text, txtTevsir.Text,
+                numMiqdar.Value, numMinStok.Value, cmbOlcuVahidi.SelectedItem,
                 dtpIstehsalTarixi.Value.ToString("yyyy-MM-dd"),
-                txtAlisQiymeti.Text,
-                txtSatisQiymeti.Text,
-                cmbKateqoriya.SelectedItem,
+                txtAlisQiymeti.Text, txtSatisQiymeti.Text, cmbKateqoriya.SelectedItem,
                 imagePath
             );
 
             try
             {
-                List<string> lines = new List<string>();
+                List<string> decryptedLines = new List<string>();
                 if (File.Exists(productsFilePath))
                 {
-                    lines = File.ReadAllLines(productsFilePath).ToList();
+                    decryptedLines = File.ReadAllLines(productsFilePath)
+                                        .Select(line => EncryptionHelper.Decrypt(line)).ToList();
                 }
 
                 if (IsEditMode)
                 {
-                    // Redaktə rejimi
-                    int index = lines.FindIndex(line => line.Split('|')[0] == originalBarcode);
+                    if (originalBarcode != txtBarkod.Text.Trim() && decryptedLines.Any(line => line.Split('|')[0].Equals(txtBarkod.Text.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("Daxil etdiyiniz yeni barkod başqa bir məhsulda mövcuddur.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    int index = decryptedLines.FindIndex(line => line.Split('|')[0] == originalBarcode);
                     if (index != -1)
                     {
-                        lines[index] = productInfo;
+                        decryptedLines[index] = productInfo;
                     }
                 }
                 else
                 {
-                    // Əlavə etmə rejimi
-                    // Barkodun unikal olub-olmadığını yoxlayırıq
-                    if (lines.Any(line => line.Split('|')[0].Equals(txtBarkod.Text, StringComparison.OrdinalIgnoreCase)))
+                    if (decryptedLines.Any(line => line.Split('|')[0].Equals(txtBarkod.Text.Trim(), StringComparison.OrdinalIgnoreCase)))
                     {
                         MessageBox.Show("Bu barkod artıq mövcuddur.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
-                    lines.Add(productInfo);
+                    decryptedLines.Add(productInfo);
                 }
 
-                File.WriteAllLines(productsFilePath, lines);
+                var encryptedLines = decryptedLines.Select(line => EncryptionHelper.Encrypt(line));
+                File.WriteAllLines(productsFilePath, encryptedLines);
+
                 MessageBox.Show("Məlumatlar uğurla yadda saxlanıldı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 this.DialogResult = DialogResult.OK;
@@ -179,6 +172,12 @@ namespace POS
             {
                 MessageBox.Show($"Məlumatları yadda saxlayarkən xəta baş verdi: {ex.Message}", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnLegvEt_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
         }
     }
 }

@@ -26,7 +26,11 @@ namespace POS
             lstCategories.Items.Clear();
             if (File.Exists(categoriesFilePath))
             {
-                lstCategories.Items.AddRange(File.ReadAllLines(categoriesFilePath));
+                var encryptedLines = File.ReadAllLines(categoriesFilePath);
+                foreach (var encryptedLine in encryptedLines)
+                {
+                    lstCategories.Items.Add(EncryptionHelper.Decrypt(encryptedLine));
+                }
             }
         }
 
@@ -53,10 +57,11 @@ namespace POS
                 return;
             }
 
-            File.AppendAllText(categoriesFilePath, newCategory + Environment.NewLine);
+            string encryptedCategory = EncryptionHelper.Encrypt(newCategory);
+            File.AppendAllText(categoriesFilePath, encryptedCategory + Environment.NewLine);
             LoadCategories();
             txtCategoryName.Clear();
-            this.DialogResult = DialogResult.OK; // Ana formanın yenilənməsi üçün
+            this.DialogResult = DialogResult.OK;
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -82,14 +87,20 @@ namespace POS
                 return;
             }
 
-            List<string> categories = File.ReadAllLines(categoriesFilePath).ToList();
+            List<string> categories = new List<string>();
+            foreach (var item in lstCategories.Items)
+            {
+                categories.Add(item.ToString());
+            }
+
             int index = categories.FindIndex(c => c == oldCategory);
             if (index != -1)
             {
                 categories[index] = newCategory;
-                File.WriteAllLines(categoriesFilePath, categories);
 
-                // Məhsullar faylında da bu kateqoriyanı yeniləyirik
+                var encryptedCategories = categories.Select(c => EncryptionHelper.Encrypt(c));
+                File.WriteAllLines(categoriesFilePath, encryptedCategories);
+
                 UpdateCategoryInProducts(oldCategory, newCategory);
 
                 LoadCategories();
@@ -102,23 +113,25 @@ namespace POS
         {
             if (!File.Exists(productsFilePath)) return;
 
-            List<string> productLines = File.ReadAllLines(productsFilePath).ToList();
+            List<string> encryptedLines = File.ReadAllLines(productsFilePath).ToList();
+            List<string> decryptedLines = encryptedLines.Select(line => EncryptionHelper.Decrypt(line)).ToList();
             bool updated = false;
 
-            for (int i = 0; i < productLines.Count; i++)
+            for (int i = 0; i < decryptedLines.Count; i++)
             {
-                string[] parts = productLines[i].Split('|');
+                string[] parts = decryptedLines[i].Split('|');
                 if (parts.Length == 11 && parts[9] == oldCategory)
                 {
                     parts[9] = newCategory;
-                    productLines[i] = string.Join("|", parts);
+                    decryptedLines[i] = string.Join("|", parts);
                     updated = true;
                 }
             }
 
             if (updated)
             {
-                File.WriteAllLines(productsFilePath, productLines);
+                var reEncryptedLines = decryptedLines.Select(line => EncryptionHelper.Encrypt(line));
+                File.WriteAllLines(productsFilePath, reEncryptedLines);
             }
         }
 
@@ -133,11 +146,11 @@ namespace POS
 
             string categoryToDelete = lstCategories.SelectedItem.ToString();
 
-            // Məhsullar faylında bu kateqoriyanın istifadə edilib-edilmədiyini yoxlayırıq
             if (File.Exists(productsFilePath))
             {
                 bool isUsed = File.ReadAllLines(productsFilePath)
-                                  .Any(line => line.Split('|').Length == 11 && line.Split('|')[9] == categoryToDelete);
+                                  .Select(line => EncryptionHelper.Decrypt(line))
+                                  .Any(decryptedLine => decryptedLine.Split('|').Length == 11 && decryptedLine.Split('|')[9] == categoryToDelete);
                 if (isUsed)
                 {
                     MessageBox.Show("Bu kateqoriya məhsullarda istifadə edildiyi üçün silinə bilməz.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -147,9 +160,16 @@ namespace POS
 
             if (MessageBox.Show($"'{categoryToDelete}' kateqoriyasını silməyə əminsiniz?", "Silməni təsdiqlə", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                List<string> categories = File.ReadAllLines(categoriesFilePath).ToList();
+                List<string> categories = new List<string>();
+                foreach (var item in lstCategories.Items)
+                {
+                    categories.Add(item.ToString());
+                }
+
                 categories.Remove(categoryToDelete);
-                File.WriteAllLines(categoriesFilePath, categories);
+                var encryptedCategories = categories.Select(c => EncryptionHelper.Encrypt(c));
+                File.WriteAllLines(categoriesFilePath, encryptedCategories);
+
                 LoadCategories();
                 txtCategoryName.Clear();
                 this.DialogResult = DialogResult.OK;

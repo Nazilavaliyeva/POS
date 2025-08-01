@@ -21,7 +21,7 @@ namespace POS
         private void Frm_Reports_Load(object sender, EventArgs e)
         {
             SetupDataGridView();
-            // Form yüklənəndə son 1 ayın hesabatını avtomatik göstər
+            // Load the report for the last month automatically when the form loads
             dtpBaslangic.Value = DateTime.Now.AddMonths(-1);
             dtpBitis.Value = DateTime.Now;
             btnHesabatiGoster_Click(sender, e);
@@ -52,38 +52,41 @@ namespace POS
 
             try
             {
-                // Məhsulların alış qiymətlərini lüğətə yığırıq
+                // Gather purchase prices of products into a dictionary
                 var productCosts = File.ReadAllLines(productsFilePath)
+                    .Select(line => EncryptionHelper.Decrypt(line))
                     .Select(line => line.Split('|'))
                     .Where(parts => parts.Length == 11)
                     .ToDictionary(parts => parts[1], parts => decimal.Parse(parts[7])); // Key: Ad, Value: Alış Qiyməti
 
-                var salesLines = File.ReadAllLines(salesFilePath);
+                var encryptedSalesLines = File.ReadAllLines(salesFilePath);
 
                 decimal umumiGelir = 0;
                 decimal umumiMayaDeyeri = 0;
 
                 DateTime baslangicTarix = dtpBaslangic.Value.Date;
-                DateTime bitisTarix = dtpBitis.Value.Date.AddDays(1).AddTicks(-1); // Günün sonuna qədər
+                DateTime bitisTarix = dtpBitis.Value.Date.AddDays(1).AddTicks(-1); // Until the end of the day
 
-                foreach (string line in salesLines)
+                foreach (string encryptedLine in encryptedSalesLines)
                 {
+                    string line = EncryptionHelper.Decrypt(encryptedLine);
                     string[] parts = line.Split('|');
-                    if (parts.Length == 5)
+                    // Format: TransactionID|Date|Barkod|ProductName|Quantity|SalePrice
+                    if (parts.Length == 6)
                     {
                         DateTime satisTarixi = DateTime.Parse(parts[1]);
 
                         if (satisTarixi >= baslangicTarix && satisTarixi <= bitisTarix)
                         {
-                            string mehsulAdi = parts[2];
-                            int miqdar = int.Parse(parts[3]);
-                            decimal satisQiymeti = decimal.Parse(parts[4]);
+                            string mehsulAdi = parts[3];
+                            int miqdar = int.Parse(parts[4]);
+                            decimal satisQiymeti = decimal.Parse(parts[5]);
                             decimal toplamMebleg = miqdar * satisQiymeti;
 
-                            // Cədvələ əlavə edirik
+                            // Add to the table
                             salesTable.Rows.Add(parts[0], satisTarixi, mehsulAdi, miqdar, satisQiymeti, toplamMebleg);
 
-                            // Hesabat üçün rəqəmləri cəmləyirik
+                            // Sum up the figures for the report
                             umumiGelir += toplamMebleg;
                             if (productCosts.ContainsKey(mehsulAdi))
                             {
@@ -93,7 +96,7 @@ namespace POS
                     }
                 }
 
-                // Yekun rəqəmləri göstəririk
+                // Display the final numbers
                 lblUmumiGelir.Text = $"{umumiGelir:F2} ₼";
                 lblMayaDeyeri.Text = $"{umumiMayaDeyeri:F2} ₼";
                 lblXalisQazanc.Text = $"{(umumiGelir - umumiMayaDeyeri):F2} ₼";

@@ -29,13 +29,6 @@ namespace POS
             LoadCategoriesFilter();
         }
 
-        // Bu metod designer.cs faylındakı köhnə referansdan qalan potensial xətanı aradan qaldırmaq üçündür.
-        // Artıq istifadə edilmədiyi üçün içi boşdur.
-        private void textBox4_TextChanged(object sender, EventArgs e)
-        {
-            // Bu metod artıq istifadə edilmir.
-        }
-
         private void SetupDataTables()
         {
             productTable.Columns.Add("Barkod", typeof(string));
@@ -71,9 +64,10 @@ namespace POS
 
             try
             {
-                string[] lines = File.ReadAllLines(productsFilePath);
-                foreach (string line in lines)
+                var encryptedLines = File.ReadAllLines(productsFilePath);
+                foreach (var encryptedLine in encryptedLines)
                 {
+                    string line = EncryptionHelper.Decrypt(encryptedLine);
                     string[] parts = line.Split('|');
                     if (parts.Length == 11)
                     {
@@ -117,7 +111,9 @@ namespace POS
                 cmbKateqoriyaFilter.Items.Add("Bütün Kateqoriyalar");
                 if (File.Exists(categoriesFilePath))
                 {
-                    cmbKateqoriyaFilter.Items.AddRange(File.ReadAllLines(categoriesFilePath));
+                    var encryptedLines = File.ReadAllLines(categoriesFilePath);
+                    var decryptedLines = encryptedLines.Select(line => EncryptionHelper.Decrypt(line));
+                    cmbKateqoriyaFilter.Items.AddRange(decryptedLines.ToArray());
                 }
                 cmbKateqoriyaFilter.SelectedIndex = 0;
             }
@@ -152,12 +148,13 @@ namespace POS
             try
             {
                 string selectedBarcode = dgvProducts.SelectedRows[0].Cells["Barkod"].Value.ToString();
-                string[] lines = File.ReadAllLines(productsFilePath);
-                string productLine = lines.FirstOrDefault(line => line.Split('|')[0] == selectedBarcode);
 
-                if (productLine != null)
+                var encryptedLines = File.ReadAllLines(productsFilePath);
+                string encryptedProductLine = encryptedLines.FirstOrDefault(line => EncryptionHelper.Decrypt(line).Split('|')[0] == selectedBarcode);
+
+                if (encryptedProductLine != null)
                 {
-                    Frm_ProductDetails updateForm = new Frm_ProductDetails(productLine.Split('|'));
+                    Frm_ProductDetails updateForm = new Frm_ProductDetails(EncryptionHelper.Decrypt(encryptedProductLine).Split('|'));
                     if (updateForm.ShowDialog() == DialogResult.OK)
                     {
                         LoadProducts();
@@ -183,9 +180,11 @@ namespace POS
                 try
                 {
                     string selectedBarcode = dgvProducts.SelectedRows[0].Cells["Barkod"].Value.ToString();
-                    List<string> lines = File.ReadAllLines(productsFilePath).ToList();
-                    lines.RemoveAll(line => line.Split('|')[0] == selectedBarcode);
-                    File.WriteAllLines(productsFilePath, lines);
+
+                    var encryptedLines = File.ReadAllLines(productsFilePath).ToList();
+                    encryptedLines.RemoveAll(encryptedLine => EncryptionHelper.Decrypt(encryptedLine).Split('|')[0] == selectedBarcode);
+                    File.WriteAllLines(productsFilePath, encryptedLines);
+
                     LoadProducts();
                 }
                 catch (Exception ex)
@@ -250,6 +249,15 @@ namespace POS
             }
         }
 
+        private void btnGeriQaytarma_Click(object sender, EventArgs e)
+        {
+            Frm_ReturnProduct returnForm = new Frm_ReturnProduct();
+            if (returnForm.ShowDialog() == DialogResult.OK)
+            {
+                LoadProducts();
+            }
+        }
+
         private void AddToBasket(string barkod)
         {
             DataRow productRow = productTable.Select($"Barkod = '{barkod}'").FirstOrDefault();
@@ -300,7 +308,6 @@ namespace POS
             UpdateTotal();
         }
 
-        // POS.cs faylında bu metodu yeniləyin
         private void btnSatisEt_Click(object sender, EventArgs e)
         {
             if (basketTable.Rows.Count == 0)
@@ -311,9 +318,10 @@ namespace POS
 
             try
             {
-                List<string> productLines = File.ReadAllLines(productsFilePath).ToList();
-                string salesRecord = "";
+                List<string> encryptedProductLines = File.ReadAllLines(productsFilePath).ToList();
+                List<string> decryptedProductLines = encryptedProductLines.Select(line => EncryptionHelper.Decrypt(line)).ToList();
 
+                string salesRecord = "";
                 string transactionId = Guid.NewGuid().ToString().Substring(0, 8);
                 DateTime saleDate = DateTime.Now;
 
@@ -322,19 +330,21 @@ namespace POS
                     string barkod = row["Barkod"].ToString();
                     int satilanMiqdar = (int)row["Miqdar"];
 
-                    int index = productLines.FindIndex(line => line.Split('|')[0] == barkod);
+                    int index = decryptedProductLines.FindIndex(line => line.Split('|')[0] == barkod);
                     if (index != -1)
                     {
-                        string[] parts = productLines[index].Split('|');
-                        int yeniMiqdar = int.Parse(parts[3]) - satilanMiqdar;
-                        parts[3] = yeniMiqdar.ToString();
-                        productLines[index] = string.Join("|", parts);
+                        string[] parts = decryptedProductLines[index].Split('|');
+                        parts[3] = (int.Parse(parts[3]) - satilanMiqdar).ToString();
+                        decryptedProductLines[index] = string.Join("|", parts);
                     }
-                    // YENİLƏMƏ: Satış qeydinə BARKOD da əlavə edildi (yeni format)
-                    salesRecord += $"{transactionId}|{saleDate:yyyy-MM-dd HH:mm:ss}|{barkod}|{row["Ad"]}|{satilanMiqdar}|{row["Qiymət"]}{Environment.NewLine}";
+
+                    string singleSaleInfo = $"{transactionId}|{saleDate:yyyy-MM-dd HH:mm:ss}|{barkod}|{row["Ad"]}|{satilanMiqdar}|{row["Qiymət"]}";
+                    salesRecord += EncryptionHelper.Encrypt(singleSaleInfo) + Environment.NewLine;
                 }
 
-                File.WriteAllLines(productsFilePath, productLines);
+                var reEncryptedProductLines = decryptedProductLines.Select(line => EncryptionHelper.Encrypt(line));
+                File.WriteAllLines(productsFilePath, reEncryptedProductLines);
+
                 File.AppendAllText(salesFilePath, salesRecord);
 
                 MessageBox.Show("Satış uğurla tamamlandı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
