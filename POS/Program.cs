@@ -16,6 +16,7 @@ namespace POS
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            DataAccess.InitializeDatabase();
             Application.Run(new Frm_login());
         }
     }
