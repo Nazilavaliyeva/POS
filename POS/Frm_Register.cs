@@ -37,13 +37,14 @@ namespace POS
                 if (File.Exists(usersFilePath))
                 {
                     var lines = File.ReadAllLines(usersFilePath);
-                    foreach (var encryptedLine in lines)
+                    foreach (var line in lines) // DƏYİŞİKLİK: 'encryptedLine' -> 'line'
                     {
                         // DÜZƏLİŞ: Boş sətirləri nəzərə almamaq üçün yoxlama.
-                        if (string.IsNullOrWhiteSpace(encryptedLine)) continue;
+                        if (string.IsNullOrWhiteSpace(line)) continue;
 
-                        var decryptedLine = EncryptionHelper.Decrypt(encryptedLine);
-                        string[] parts = decryptedLine.Split(',');
+                        // SİLİNDİ: Deşifrələmə artıq lazım deyil
+                        // var decryptedLine = EncryptionHelper.Decrypt(line); 
+                        string[] parts = line.Split(',');
 
                         // DÜZƏLİŞ: Fayldakı sətrin düzgün formatda olub-olmadığını yoxlayırıq.
                         if (parts.Length > 0 && parts[0].Equals(istifadeciAdi, StringComparison.OrdinalIgnoreCase))
@@ -57,11 +58,12 @@ namespace POS
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(sifre);
                 string userInfo = $"{istifadeciAdi},{hashedPassword}";
 
-                string encryptedUserInfo = EncryptionHelper.Encrypt(userInfo);
-                File.AppendAllText(usersFilePath, encryptedUserInfo + Environment.NewLine);
+                // SİLİNDİ: AES şifrələməsi ləğv edildi
+                // string encryptedUserInfo = EncryptionHelper.Encrypt(userInfo); 
+                File.AppendAllText(usersFilePath, userInfo + Environment.NewLine); // DƏYİŞİKLİK: Birbaşa 'userInfo' yazılır
 
                 MessageBox.Show("Qeydiyyat uğurla tamamlandı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.DialogResult = DialogResult.OK; // DİALOGRESULT SET EDİLDİ
+                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)

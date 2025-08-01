@@ -2,12 +2,41 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Configuration; // Bu sətirin olduğundan əmin olun
 
 public static class EncryptionHelper
 {
-    // DİQQƏT: Real layihədə bu açarlar heç vaxt kodda saxlanmamalıdır!
-    private static readonly byte[] Key = Encoding.UTF8.GetBytes("Bu32ByteUzunluqluBirAcardir12345"); // DÜZƏLİŞ: 32 bayta tamamlandı
-    private static readonly byte[] IV = Encoding.UTF8.GetBytes("Bu16ByteIVdir123");              // 16 byte (128-bit)
+    private static readonly byte[] Key;
+    private static readonly byte[] IV;
+
+    // DƏYİŞİKLİK: Açarları oxumaq və yoxlamaq üçün static constructor əlavə edildi
+    static EncryptionHelper()
+    {
+        string keyString = ConfigurationManager.AppSettings["EncryptionKey"];
+        string ivString = ConfigurationManager.AppSettings["EncryptionIV"];
+
+        if (string.IsNullOrEmpty(keyString))
+        {
+            throw new ConfigurationErrorsException("Xəta: App.config faylında 'EncryptionKey' tapılmadı və ya dəyəri boşdur.");
+        }
+        if (string.IsNullOrEmpty(ivString))
+        {
+            throw new ConfigurationErrorsException("Xəta: App.config faylında 'EncryptionIV' tapılmadı və ya dəyəri boşdur.");
+        }
+
+        Key = Encoding.UTF8.GetBytes(keyString);
+        IV = Encoding.UTF8.GetBytes(ivString);
+
+        // Təhlükəsizlik üçün yoxlama: Açarın və Vektorun uzunluğunu yoxlayırıq.
+        if (Key.Length != 32)
+        {
+            throw new ConfigurationErrorsException("'EncryptionKey' dəyəri App.config faylında 32 simvol olmalıdır.");
+        }
+        if (IV.Length != 16)
+        {
+            throw new ConfigurationErrorsException("'EncryptionIV' dəyəri App.config faylında 16 simvol olmalıdır.");
+        }
+    }
 
     public static string Encrypt(string plainText)
     {

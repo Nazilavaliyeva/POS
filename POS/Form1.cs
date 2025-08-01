@@ -36,13 +36,14 @@ namespace POS
             bool girisUqurlu = false;
             try
             {
-                var encryptedLines = File.ReadAllLines(usersFilePath);
-                foreach (var encryptedLine in encryptedLines)
+                var lines = File.ReadAllLines(usersFilePath); // DƏYİŞİKLİK: 'encryptedLines' -> 'lines'
+                foreach (var line in lines) // DƏYİŞİKLİK: 'encryptedLine' -> 'line'
                 {
-                    if (string.IsNullOrWhiteSpace(encryptedLine)) continue;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    string decryptedLine = EncryptionHelper.Decrypt(encryptedLine);
-                    string[] userCredentials = decryptedLine.Split(',');
+                    // SİLİNDİ: Deşifrələmə artıq lazım deyil
+                    // string decryptedLine = EncryptionHelper.Decrypt(line); 
+                    string[] userCredentials = line.Split(',');
 
                     if (userCredentials.Length == 2 && userCredentials[0].Equals(ad, StringComparison.OrdinalIgnoreCase))
                     {
