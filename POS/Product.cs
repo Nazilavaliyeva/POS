@@ -11,6 +11,6 @@
         public decimal PurchasePrice { get; set; }
         public decimal SalePrice { get; set; }
         public string ImagePath { get; set; }
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
     }
 }

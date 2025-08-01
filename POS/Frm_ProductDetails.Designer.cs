@@ -17,7 +17,6 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_login));
             this.lblMehsulAd = new System.Windows.Forms.Label();
             this.txtMehsulAd = new System.Windows.Forms.TextBox();
             this.lblMiqdar = new System.Windows.Forms.Label();
@@ -71,7 +70,7 @@
             this.lblMiqdar.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMiqdar.Location = new System.Drawing.Point(12, 199);
             this.lblMiqdar.Name = "lblMiqdar";
-            this.lblMiqdar.Size = new System.Drawing.Size(64, 20);
+            this.lblMiqdar.Size = new System.Drawing.Size(65, 20);
             this.lblMiqdar.TabIndex = 2;
             this.lblMiqdar.Text = "Miqdar:";
             // 
@@ -81,7 +80,7 @@
             this.lblAlisQiymeti.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAlisQiymeti.Location = new System.Drawing.Point(12, 319);
             this.lblAlisQiymeti.Name = "lblAlisQiymeti";
-            this.lblAlisQiymeti.Size = new System.Drawing.Size(102, 20);
+            this.lblAlisQiymeti.Size = new System.Drawing.Size(104, 20);
             this.lblAlisQiymeti.TabIndex = 4;
             this.lblAlisQiymeti.Text = "Alış Qiyməti:";
             // 
@@ -99,7 +98,7 @@
             this.lblSatisQiymeti.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSatisQiymeti.Location = new System.Drawing.Point(12, 359);
             this.lblSatisQiymeti.Name = "lblSatisQiymeti";
-            this.lblSatisQiymeti.Size = new System.Drawing.Size(111, 20);
+            this.lblSatisQiymeti.Size = new System.Drawing.Size(114, 20);
             this.lblSatisQiymeti.TabIndex = 6;
             this.lblSatisQiymeti.Text = "Satış Qiyməti:";
             // 
@@ -117,7 +116,7 @@
             this.lblKateqoriya.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblKateqoriya.Location = new System.Drawing.Point(12, 399);
             this.lblKateqoriya.Name = "lblKateqoriya";
-            this.lblKateqoriya.Size = new System.Drawing.Size(91, 20);
+            this.lblKateqoriya.Size = new System.Drawing.Size(93, 20);
             this.lblKateqoriya.TabIndex = 8;
             this.lblKateqoriya.Text = "Kateqoriya:";
             // 
@@ -186,7 +185,7 @@
             this.lblBarkod.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblBarkod.Location = new System.Drawing.Point(12, 19);
             this.lblBarkod.Name = "lblBarkod";
-            this.lblBarkod.Size = new System.Drawing.Size(68, 20);
+            this.lblBarkod.Size = new System.Drawing.Size(67, 20);
             this.lblBarkod.TabIndex = 14;
             this.lblBarkod.Text = "Barkod:";
             // 
@@ -204,7 +203,7 @@
             this.lblTevsir.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTevsir.Location = new System.Drawing.Point(12, 99);
             this.lblTevsir.Name = "lblTevsir";
-            this.lblTevsir.Size = new System.Drawing.Size(133, 20);
+            this.lblTevsir.Size = new System.Drawing.Size(123, 20);
             this.lblTevsir.TabIndex = 16;
             this.lblTevsir.Text = "Məhsul Təsviri:";
             // 
@@ -223,7 +222,7 @@
             this.lblMinStok.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMinStok.Location = new System.Drawing.Point(12, 239);
             this.lblMinStok.Name = "lblMinStok";
-            this.lblMinStok.Size = new System.Drawing.Size(152, 20);
+            this.lblMinStok.Size = new System.Drawing.Size(153, 20);
             this.lblMinStok.TabIndex = 18;
             this.lblMinStok.Text = "Minimum Stok Səv:";
             // 
@@ -233,7 +232,7 @@
             this.lblOlcuVahidi.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblOlcuVahidi.Location = new System.Drawing.Point(12, 279);
             this.lblOlcuVahidi.Name = "lblOlcuVahidi";
-            this.lblOlcuVahidi.Size = new System.Drawing.Size(102, 20);
+            this.lblOlcuVahidi.Size = new System.Drawing.Size(100, 20);
             this.lblOlcuVahidi.TabIndex = 20;
             this.lblOlcuVahidi.Text = "Ölçü Vahidi:";
             // 
@@ -326,7 +325,6 @@
             this.Controls.Add(this.txtMehsulAd);
             this.Controls.Add(this.lblMehsulAd);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Frm_ProductDetails";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -337,6 +335,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numMinStok)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
