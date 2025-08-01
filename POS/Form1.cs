@@ -39,21 +39,18 @@ namespace POS
                 var encryptedLines = File.ReadAllLines(usersFilePath);
                 foreach (var encryptedLine in encryptedLines)
                 {
-                    // DÜZƏLİŞ: Boş sətirləri nəzərə almamaq üçün yoxlama.
                     if (string.IsNullOrWhiteSpace(encryptedLine)) continue;
 
                     string decryptedLine = EncryptionHelper.Decrypt(encryptedLine);
                     string[] userCredentials = decryptedLine.Split(',');
 
-                    // DÜZƏLİŞ: Fayldakı sətrin düzgün formatda (ad,şifrə) olub-olmadığını yoxlayırıq.
-                    // Bu, proqramın "IndexOutOfRangeException" xətası verərək çökməsinin qarşısını alır.
                     if (userCredentials.Length == 2 && userCredentials[0].Equals(ad, StringComparison.OrdinalIgnoreCase))
                     {
                         string savedHashedPassword = userCredentials[1];
                         if (BCrypt.Net.BCrypt.Verify(sifre, savedHashedPassword))
                         {
                             girisUqurlu = true;
-                            break; // Düzgün istifadəçi tapıldı, döngüdən çıxırıq.
+                            break;
                         }
                     }
                 }

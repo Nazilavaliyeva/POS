@@ -2,15 +2,8 @@
 {
     partial class frmPOS
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,10 +15,6 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPOS));
@@ -47,9 +36,16 @@
             this.label3 = new System.Windows.Forms.Label();
             this.btnHesabatlar = new System.Windows.Forms.Button();
             this.btnKateqoriyalar = new System.Windows.Forms.Button();
+            this.btnGeriQaytarma = new System.Windows.Forms.Button();
+            this.panelDailySummary = new System.Windows.Forms.Panel();
+            this.lblTodayProfit = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.lblTodayRevenue = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBasket)).BeginInit();
             this.panel1.SuspendLayout();
+            this.panelDailySummary.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvProducts
@@ -75,7 +71,7 @@
             this.lblAxtaris.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAxtaris.Location = new System.Drawing.Point(12, 19);
             this.lblAxtaris.Name = "lblAxtaris";
-            this.lblAxtaris.Size = new System.Drawing.Size(117, 20);
+            this.lblAxtaris.Size = new System.Drawing.Size(123, 20);
             this.lblAxtaris.TabIndex = 1;
             this.lblAxtaris.Text = "Ada görə axtar:";
             // 
@@ -122,7 +118,7 @@
             this.lblKateqoriyaFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblKateqoriyaFilter.Location = new System.Drawing.Point(391, 19);
             this.lblKateqoriyaFilter.Name = "lblKateqoriyaFilter";
-            this.lblKateqoriyaFilter.Size = new System.Drawing.Size(91, 20);
+            this.lblKateqoriyaFilter.Size = new System.Drawing.Size(93, 20);
             this.lblKateqoriyaFilter.TabIndex = 5;
             this.lblKateqoriyaFilter.Text = "Kateqoriya:";
             // 
@@ -176,13 +172,13 @@
             // 
             // lblYekunMebleg
             // 
-            this.lblYekunMebleg.AutoSize = true;
             this.lblYekunMebleg.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblYekunMebleg.Location = new System.Drawing.Point(395, 18);
+            this.lblYekunMebleg.Location = new System.Drawing.Point(286, 18);
             this.lblYekunMebleg.Name = "lblYekunMebleg";
-            this.lblYekunMebleg.Size = new System.Drawing.Size(90, 29);
+            this.lblYekunMebleg.Size = new System.Drawing.Size(200, 29);
             this.lblYekunMebleg.TabIndex = 1;
             this.lblYekunMebleg.Text = "0.00 ₼";
+            this.lblYekunMebleg.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label1
             // 
@@ -190,7 +186,7 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(14, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(193, 29);
+            this.label1.Size = new System.Drawing.Size(188, 29);
             this.label1.TabIndex = 0;
             this.label1.Text = "Yekun Məbləğ:";
             // 
@@ -214,9 +210,9 @@
             this.btnSebetiTemizle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSebetiTemizle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSebetiTemizle.ForeColor = System.Drawing.Color.White;
-            this.btnSebetiTemizle.Location = new System.Drawing.Point(590, 521);
+            this.btnSebetiTemizle.Location = new System.Drawing.Point(424, 571);
             this.btnSebetiTemizle.Name = "btnSebetiTemizle";
-            this.btnSebetiTemizle.Size = new System.Drawing.Size(180, 40);
+            this.btnSebetiTemizle.Size = new System.Drawing.Size(148, 40);
             this.btnSebetiTemizle.TabIndex = 11;
             this.btnSebetiTemizle.Text = "Səbəti Təmizlə";
             this.btnSebetiTemizle.UseVisualStyleBackColor = false;
@@ -228,7 +224,7 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(12, 57);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(182, 25);
+            this.label2.Size = new System.Drawing.Size(151, 25);
             this.label2.TabIndex = 12;
             this.label2.Text = "Məhsul Anbarı";
             // 
@@ -238,7 +234,7 @@
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.Location = new System.Drawing.Point(585, 57);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(141, 25);
+            this.label3.Size = new System.Drawing.Size(129, 25);
             this.label3.TabIndex = 13;
             this.label3.Text = "Satış Səbəti";
             // 
@@ -248,9 +244,9 @@
             this.btnHesabatlar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHesabatlar.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnHesabatlar.ForeColor = System.Drawing.Color.White;
-            this.btnHesabatlar.Location = new System.Drawing.Point(590, 571);
+            this.btnHesabatlar.Location = new System.Drawing.Point(753, 12);
             this.btnHesabatlar.Name = "btnHesabatlar";
-            this.btnHesabatlar.Size = new System.Drawing.Size(180, 40);
+            this.btnHesabatlar.Size = new System.Drawing.Size(120, 34);
             this.btnHesabatlar.TabIndex = 14;
             this.btnHesabatlar.Text = "Hesabatlar";
             this.btnHesabatlar.UseVisualStyleBackColor = false;
@@ -262,19 +258,88 @@
             this.btnKateqoriyalar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnKateqoriyalar.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnKateqoriyalar.ForeColor = System.Drawing.Color.White;
-            this.btnKateqoriyalar.Location = new System.Drawing.Point(424, 571);
+            this.btnKateqoriyalar.Location = new System.Drawing.Point(879, 12);
             this.btnKateqoriyalar.Name = "btnKateqoriyalar";
-            this.btnKateqoriyalar.Size = new System.Drawing.Size(148, 40);
+            this.btnKateqoriyalar.Size = new System.Drawing.Size(120, 34);
             this.btnKateqoriyalar.TabIndex = 15;
             this.btnKateqoriyalar.Text = "Kateqoriyalar";
             this.btnKateqoriyalar.UseVisualStyleBackColor = false;
             this.btnKateqoriyalar.Click += new System.EventHandler(this.btnKateqoriyalar_Click);
+            // 
+            // btnGeriQaytarma
+            // 
+            this.btnGeriQaytarma.BackColor = System.Drawing.Color.DarkOrange;
+            this.btnGeriQaytarma.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGeriQaytarma.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold);
+            this.btnGeriQaytarma.ForeColor = System.Drawing.Color.White;
+            this.btnGeriQaytarma.Location = new System.Drawing.Point(1005, 12);
+            this.btnGeriQaytarma.Name = "btnGeriQaytarma";
+            this.btnGeriQaytarma.Size = new System.Drawing.Size(85, 34);
+            this.btnGeriQaytarma.TabIndex = 17;
+            this.btnGeriQaytarma.Text = "Qaytar";
+            this.btnGeriQaytarma.UseVisualStyleBackColor = false;
+            this.btnGeriQaytarma.Click += new System.EventHandler(this.btnGeriQaytarma_Click);
+            // 
+            // panelDailySummary
+            // 
+            this.panelDailySummary.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.panelDailySummary.Controls.Add(this.lblTodayProfit);
+            this.panelDailySummary.Controls.Add(this.label5);
+            this.panelDailySummary.Controls.Add(this.lblTodayRevenue);
+            this.panelDailySummary.Controls.Add(this.label4);
+            this.panelDailySummary.Location = new System.Drawing.Point(590, 521);
+            this.panelDailySummary.Name = "panelDailySummary";
+            this.panelDailySummary.Size = new System.Drawing.Size(254, 90);
+            this.panelDailySummary.TabIndex = 16;
+            // 
+            // lblTodayProfit
+            // 
+            this.lblTodayProfit.AutoSize = true;
+            this.lblTodayProfit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTodayProfit.ForeColor = System.Drawing.Color.Green;
+            this.lblTodayProfit.Location = new System.Drawing.Point(150, 55);
+            this.lblTodayProfit.Name = "lblTodayProfit";
+            this.lblTodayProfit.Size = new System.Drawing.Size(64, 20);
+            this.lblTodayProfit.TabIndex = 3;
+            this.lblTodayProfit.Text = "0.00 ₼";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(13, 55);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(157, 20);
+            this.label5.TabIndex = 2;
+            this.label5.Text = "Bugünkü Qazanc:";
+            // 
+            // lblTodayRevenue
+            // 
+            this.lblTodayRevenue.AutoSize = true;
+            this.lblTodayRevenue.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTodayRevenue.Location = new System.Drawing.Point(150, 15);
+            this.lblTodayRevenue.Name = "lblTodayRevenue";
+            this.lblTodayRevenue.Size = new System.Drawing.Size(64, 20);
+            this.lblTodayRevenue.TabIndex = 1;
+            this.lblTodayRevenue.Text = "0.00 ₼";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(13, 15);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(134, 20);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Bugünkü Gəlir:";
             // 
             // frmPOS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1102, 623);
+            this.Controls.Add(this.panelDailySummary);
+            this.Controls.Add(this.btnGeriQaytarma);
             this.Controls.Add(this.btnKateqoriyalar);
             this.Controls.Add(this.btnHesabatlar);
             this.Controls.Add(this.label3);
@@ -300,6 +365,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvBasket)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panelDailySummary.ResumeLayout(false);
+            this.panelDailySummary.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -325,5 +392,11 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnHesabatlar;
         private System.Windows.Forms.Button btnKateqoriyalar;
+        private System.Windows.Forms.Button btnGeriQaytarma;
+        private System.Windows.Forms.Panel panelDailySummary;
+        private System.Windows.Forms.Label lblTodayProfit;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblTodayRevenue;
+        private System.Windows.Forms.Label label4;
     }
 }
