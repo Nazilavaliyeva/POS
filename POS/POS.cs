@@ -271,14 +271,18 @@ namespace POS
             }
         }
 
-        // Hələlik uyğunlaşdırılmayıb:
         private void btnHesabatlar_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Hesabatlar modulu verilənlər bazasına uyğunlaşdırılmalıdır.");
+            Frm_Reports reportsForm = new Frm_Reports();
+            reportsForm.ShowDialog();
         }
         private void btnGeriQaytarma_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Qaytarma modulu verilənlər bazasına uyğunlaşdırılmalıdır.");
+            Frm_ReturnProduct returnForm = new Frm_ReturnProduct();
+            if (returnForm.ShowDialog() == DialogResult.OK)
+            {
+                LoadProducts(); // Stok yeniləndiyi üçün məhsul siyahısını yeniləyirik
+            }
         }
     }
 }

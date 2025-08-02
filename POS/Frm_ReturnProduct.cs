@@ -1,37 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace POS
 {
     public partial class Frm_ReturnProduct : Form
     {
-        private readonly string salesFilePath = "sales.txt";
-        private readonly string productsFilePath = "products.txt";
-        private readonly string returnsFilePath = "returns.txt";
-        private DataTable soldItemsTable = new DataTable();
-
         public Frm_ReturnProduct()
         {
             InitializeComponent();
-            SetupDataGridView();
-        }
-
-        private void SetupDataGridView()
-        {
-            soldItemsTable.Columns.Add("Barkod", typeof(string));
-            soldItemsTable.Columns.Add("Məhsul Adı", typeof(string));
-            soldItemsTable.Columns.Add("Satılan Miqdar", typeof(int));
-            soldItemsTable.Columns.Add("Qiymət", typeof(decimal));
-            dgvSoldItems.DataSource = soldItemsTable;
         }
 
         private void btnAxtar_Click(object sender, EventArgs e)
         {
-            soldItemsTable.Clear();
+            dgvSoldItems.DataSource = null;
             btnGeriQaytar.Enabled = false;
             string satisID = txtSatisID.Text.Trim();
 
@@ -41,33 +23,23 @@ namespace POS
                 return;
             }
 
-            if (!File.Exists(salesFilePath))
+            try
             {
-                MessageBox.Show("Heç bir satış qeydi tapılmadı.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+                DataTable soldItemsTable = DataAccess.GetSaleDetailsByTransactionId(satisID);
 
-            var saleLines = File.ReadAllLines(salesFilePath)
-                                .Select(line => EncryptionHelper.Decrypt(line))
-                                .Where(decryptedLine => decryptedLine.Split('|')[0].Equals(satisID, StringComparison.OrdinalIgnoreCase))
-                                .ToList();
-
-            if (saleLines.Count == 0)
-            {
-                MessageBox.Show("Bu ID ilə satış tapılmadı.", "Məlumat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            foreach (var line in saleLines)
-            {
-                string[] parts = line.Split('|');
-                // Format: TransactionID|Date|Barkod|ProductName|Quantity|SalePrice
-                if (parts.Length == 6)
+                if (soldItemsTable.Rows.Count == 0)
                 {
-                    soldItemsTable.Rows.Add(parts[2], parts[3], int.Parse(parts[4]), decimal.Parse(parts[5]));
+                    MessageBox.Show("Bu ID ilə satış tapılmadı.", "Məlumat", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
+
+                dgvSoldItems.DataSource = soldItemsTable;
+                btnGeriQaytar.Enabled = true;
             }
-            btnGeriQaytar.Enabled = true;
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Satış axtararkən xəta baş verdi: {ex.Message}", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnGeriQaytar_Click(object sender, EventArgs e)
@@ -93,34 +65,11 @@ namespace POS
             {
                 try
                 {
-                    // 1. Update product stock
-                    var encryptedProductLines = File.ReadAllLines(productsFilePath).ToList();
-                    var decryptedProductLines = encryptedProductLines.Select(line => EncryptionHelper.Decrypt(line)).ToList();
-
-                    int index = decryptedProductLines.FindIndex(line => line.Split('|')[0].Equals(barkod, StringComparison.OrdinalIgnoreCase));
-                    if (index != -1)
-                    {
-                        string[] parts = decryptedProductLines[index].Split('|');
-                        parts[3] = (int.Parse(parts[3]) + qaytarilanMiqdar).ToString(); // Increase quantity
-                        decryptedProductLines[index] = string.Join("|", parts);
-
-                        var reEncryptedProductLines = decryptedProductLines.Select(line => EncryptionHelper.Encrypt(line));
-                        File.WriteAllLines(productsFilePath, reEncryptedProductLines);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Qaytarılan məhsul anbarda tapılmadı.", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // 2. Create a return record
-                    string returnRecord = $"{txtSatisID.Text.Trim()}|{DateTime.Now:yyyy-MM-dd HH:mm:ss}|{barkod}|{mehsulAdi}|{qaytarilanMiqdar}";
-                    string encryptedReturnRecord = EncryptionHelper.Encrypt(returnRecord);
-                    File.AppendAllText(returnsFilePath, encryptedReturnRecord + Environment.NewLine);
+                    DataAccess.ProcessReturn(txtSatisID.Text.Trim(), barkod, mehsulAdi, qaytarilanMiqdar);
 
                     MessageBox.Show("Məhsul uğurla geri qaytarıldı və stok yeniləndi.", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    this.DialogResult = DialogResult.OK; // To refresh the main form's product list
+                    this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
                 catch (Exception ex)

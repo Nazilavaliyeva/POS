@@ -312,6 +312,99 @@ namespace POS
                 }
             }
         }
+
+        public static DataTable GetSalesReport(DateTime startDate, DateTime endDate)
+        {
+            DataTable dt = new DataTable();
+            string sql = @"
+                SELECT 
+                    s.TransactionId AS 'Satış ID',
+                    s.SaleDate AS 'Tarix',
+                    s.ProductName AS 'Məhsul Adı',
+                    s.QuantitySold AS 'Miqdar',
+                    s.SalePrice AS 'Satış Qiyməti',
+                    (s.QuantitySold * s.SalePrice) AS 'Ümumi Məbləğ',
+                    p.PurchasePrice AS 'Alış Qiyməti'
+                FROM Sales s
+                LEFT JOIN Products p ON s.ProductBarcode = p.Barcode
+                WHERE s.SaleDate >= @startDate AND s.SaleDate <= @endDate
+                ORDER BY s.SaleDate DESC";
+
+            using (var cnn = new SQLiteConnection(connectionString))
+            {
+                using (var adapter = new SQLiteDataAdapter(sql, cnn))
+                {
+                    adapter.SelectCommand.Parameters.AddWithValue("@startDate", startDate.ToString("o"));
+                    adapter.SelectCommand.Parameters.AddWithValue("@endDate", endDate.ToString("o"));
+                    adapter.Fill(dt);
+                }
+            }
+            return dt;
+        }
+
+        public static DataTable GetSaleDetailsByTransactionId(string transactionId)
+        {
+            DataTable dt = new DataTable();
+            string sql = @"
+                SELECT 
+                    s.ProductBarcode AS 'Barkod',
+                    s.ProductName AS 'Məhsul Adı',
+                    s.QuantitySold AS 'Satılan Miqdar',
+                    s.SalePrice AS 'Qiymət'
+                FROM Sales s
+                WHERE s.TransactionId = @transactionId";
+
+            using (var cnn = new SQLiteConnection(connectionString))
+            {
+                using (var adapter = new SQLiteDataAdapter(sql, cnn))
+                {
+                    adapter.SelectCommand.Parameters.AddWithValue("@transactionId", transactionId);
+                    adapter.Fill(dt);
+                }
+            }
+            return dt;
+        }
+
+        public static void ProcessReturn(string originalTransactionId, string productBarcode, string productName, int quantityReturned)
+        {
+            using (var cnn = new SQLiteConnection(connectionString))
+            {
+                cnn.Open();
+                using (var transaction = cnn.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Məhsulun stokunu artır
+                        string updateStockSql = "UPDATE Products SET Quantity = Quantity + @qty WHERE Barcode = @barcode";
+                        using (var cmd = new SQLiteCommand(updateStockSql, cnn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@qty", quantityReturned);
+                            cmd.Parameters.AddWithValue("@barcode", productBarcode);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // 2. Geri qaytarma qeydi yarat
+                        string insertReturnSql = "INSERT INTO Returns (OriginalTransactionId, ReturnDate, ProductBarcode, ProductName, QuantityReturned) VALUES (@tid, @date, @barcode, @name, @qty)";
+                        using (var cmd = new SQLiteCommand(insertReturnSql, cnn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@tid", originalTransactionId);
+                            cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("o"));
+                            cmd.Parameters.AddWithValue("@barcode", productBarcode);
+                            cmd.Parameters.AddWithValue("@name", productName);
+                            cmd.Parameters.AddWithValue("@qty", quantityReturned);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
         #endregion
     }
 }

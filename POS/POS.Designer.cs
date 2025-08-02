@@ -36,16 +36,14 @@
             this.label3 = new System.Windows.Forms.Label();
             this.btnHesabatlar = new System.Windows.Forms.Button();
             this.btnKateqoriyalar = new System.Windows.Forms.Button();
-            this.btnGeriQaytarma = new System.Windows.Forms.Button();
-            this.panelDailySummary = new System.Windows.Forms.Panel();
-            this.lblTodayProfit = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.lblTodayRevenue = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.picProductBasket = new System.Windows.Forms.PictureBox();
+            this.btnDecreaseQty = new System.Windows.Forms.Button();
+            this.btnIncreaseQty = new System.Windows.Forms.Button();
+            this.btnRemoveFromBasket = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBasket)).BeginInit();
             this.panel1.SuspendLayout();
-            this.panelDailySummary.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picProductBasket)).BeginInit();
             this.SuspendLayout();
             // 
             // dgvProducts
@@ -61,7 +59,7 @@
             this.dgvProducts.RowHeadersWidth = 51;
             this.dgvProducts.RowTemplate.Height = 24;
             this.dgvProducts.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvProducts.Size = new System.Drawing.Size(560, 480);
+            this.dgvProducts.Size = new System.Drawing.Size(478, 480);
             this.dgvProducts.TabIndex = 0;
             this.dgvProducts.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProducts_CellDoubleClick);
             // 
@@ -71,7 +69,7 @@
             this.lblAxtaris.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAxtaris.Location = new System.Drawing.Point(12, 19);
             this.lblAxtaris.Name = "lblAxtaris";
-            this.lblAxtaris.Size = new System.Drawing.Size(123, 20);
+            this.lblAxtaris.Size = new System.Drawing.Size(117, 20);
             this.lblAxtaris.TabIndex = 1;
             this.lblAxtaris.Text = "Ada görə axtar:";
             // 
@@ -92,9 +90,9 @@
             this.btnYeniMehsul.ForeColor = System.Drawing.Color.White;
             this.btnYeniMehsul.Location = new System.Drawing.Point(12, 571);
             this.btnYeniMehsul.Name = "btnYeniMehsul";
-            this.btnYeniMehsul.Size = new System.Drawing.Size(132, 40);
+            this.btnYeniMehsul.Size = new System.Drawing.Size(115, 40);
             this.btnYeniMehsul.TabIndex = 3;
-            this.btnYeniMehsul.Text = "Yeni Məhsul";
+            this.btnYeniMehsul.Text = "Yeni";
             this.btnYeniMehsul.UseVisualStyleBackColor = false;
             this.btnYeniMehsul.Click += new System.EventHandler(this.btnYeniMehsul_Click);
             // 
@@ -104,9 +102,9 @@
             this.btnSil.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSil.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSil.ForeColor = System.Drawing.Color.White;
-            this.btnSil.Location = new System.Drawing.Point(288, 571);
+            this.btnSil.Location = new System.Drawing.Point(258, 571);
             this.btnSil.Name = "btnSil";
-            this.btnSil.Size = new System.Drawing.Size(130, 40);
+            this.btnSil.Size = new System.Drawing.Size(113, 40);
             this.btnSil.TabIndex = 4;
             this.btnSil.Text = "Sil";
             this.btnSil.UseVisualStyleBackColor = false;
@@ -118,7 +116,7 @@
             this.lblKateqoriyaFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblKateqoriyaFilter.Location = new System.Drawing.Point(391, 19);
             this.lblKateqoriyaFilter.Name = "lblKateqoriyaFilter";
-            this.lblKateqoriyaFilter.Size = new System.Drawing.Size(93, 20);
+            this.lblKateqoriyaFilter.Size = new System.Drawing.Size(91, 20);
             this.lblKateqoriyaFilter.TabIndex = 5;
             this.lblKateqoriyaFilter.Text = "Kateqoriya:";
             // 
@@ -139,9 +137,9 @@
             this.btnYenile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnYenile.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnYenile.ForeColor = System.Drawing.Color.White;
-            this.btnYenile.Location = new System.Drawing.Point(150, 571);
+            this.btnYenile.Location = new System.Drawing.Point(133, 571);
             this.btnYenile.Name = "btnYenile";
-            this.btnYenile.Size = new System.Drawing.Size(132, 40);
+            this.btnYenile.Size = new System.Drawing.Size(119, 40);
             this.btnYenile.TabIndex = 7;
             this.btnYenile.Text = "Yenilə";
             this.btnYenile.UseVisualStyleBackColor = false;
@@ -150,32 +148,35 @@
             // dgvBasket
             // 
             this.dgvBasket.AllowUserToAddRows = false;
+            this.dgvBasket.AllowUserToDeleteRows = false;
             this.dgvBasket.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvBasket.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvBasket.Location = new System.Drawing.Point(590, 85);
+            this.dgvBasket.Location = new System.Drawing.Point(505, 85);
             this.dgvBasket.Name = "dgvBasket";
+            this.dgvBasket.ReadOnly = true;
             this.dgvBasket.RowHeadersWidth = 51;
             this.dgvBasket.RowTemplate.Height = 24;
             this.dgvBasket.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvBasket.Size = new System.Drawing.Size(500, 360);
+            this.dgvBasket.Size = new System.Drawing.Size(433, 335);
             this.dgvBasket.TabIndex = 8;
+            this.dgvBasket.SelectionChanged += new System.EventHandler(this.dgvBasket_SelectionChanged);
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ControlLight;
             this.panel1.Controls.Add(this.lblYekunMebleg);
             this.panel1.Controls.Add(this.label1);
-            this.panel1.Location = new System.Drawing.Point(590, 451);
+            this.panel1.Location = new System.Drawing.Point(505, 547);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(500, 64);
+            this.panel1.Size = new System.Drawing.Size(371, 64);
             this.panel1.TabIndex = 9;
             // 
             // lblYekunMebleg
             // 
             this.lblYekunMebleg.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblYekunMebleg.Location = new System.Drawing.Point(286, 18);
+            this.lblYekunMebleg.Location = new System.Drawing.Point(213, 18);
             this.lblYekunMebleg.Name = "lblYekunMebleg";
-            this.lblYekunMebleg.Size = new System.Drawing.Size(200, 29);
+            this.lblYekunMebleg.Size = new System.Drawing.Size(144, 29);
             this.lblYekunMebleg.TabIndex = 1;
             this.lblYekunMebleg.Text = "0.00 ₼";
             this.lblYekunMebleg.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -186,7 +187,7 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(14, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(188, 29);
+            this.label1.Size = new System.Drawing.Size(193, 29);
             this.label1.TabIndex = 0;
             this.label1.Text = "Yekun Məbləğ:";
             // 
@@ -196,9 +197,9 @@
             this.btnSatisEt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSatisEt.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSatisEt.ForeColor = System.Drawing.Color.White;
-            this.btnSatisEt.Location = new System.Drawing.Point(850, 521);
+            this.btnSatisEt.Location = new System.Drawing.Point(957, 521);
             this.btnSatisEt.Name = "btnSatisEt";
-            this.btnSatisEt.Size = new System.Drawing.Size(240, 90);
+            this.btnSatisEt.Size = new System.Drawing.Size(160, 90);
             this.btnSatisEt.TabIndex = 10;
             this.btnSatisEt.Text = "Satışı Bitir";
             this.btnSatisEt.UseVisualStyleBackColor = false;
@@ -210,9 +211,9 @@
             this.btnSebetiTemizle.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSebetiTemizle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSebetiTemizle.ForeColor = System.Drawing.Color.White;
-            this.btnSebetiTemizle.Location = new System.Drawing.Point(424, 571);
+            this.btnSebetiTemizle.Location = new System.Drawing.Point(957, 475);
             this.btnSebetiTemizle.Name = "btnSebetiTemizle";
-            this.btnSebetiTemizle.Size = new System.Drawing.Size(148, 40);
+            this.btnSebetiTemizle.Size = new System.Drawing.Size(160, 40);
             this.btnSebetiTemizle.TabIndex = 11;
             this.btnSebetiTemizle.Text = "Səbəti Təmizlə";
             this.btnSebetiTemizle.UseVisualStyleBackColor = false;
@@ -224,7 +225,7 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(12, 57);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(151, 25);
+            this.label2.Size = new System.Drawing.Size(182, 25);
             this.label2.TabIndex = 12;
             this.label2.Text = "Məhsul Anbarı";
             // 
@@ -232,9 +233,9 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(585, 57);
+            this.label3.Location = new System.Drawing.Point(500, 57);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(129, 25);
+            this.label3.Size = new System.Drawing.Size(141, 25);
             this.label3.TabIndex = 13;
             this.label3.Text = "Satış Səbəti";
             // 
@@ -244,9 +245,9 @@
             this.btnHesabatlar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHesabatlar.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnHesabatlar.ForeColor = System.Drawing.Color.White;
-            this.btnHesabatlar.Location = new System.Drawing.Point(753, 12);
+            this.btnHesabatlar.Location = new System.Drawing.Point(957, 12);
             this.btnHesabatlar.Name = "btnHesabatlar";
-            this.btnHesabatlar.Size = new System.Drawing.Size(120, 34);
+            this.btnHesabatlar.Size = new System.Drawing.Size(160, 40);
             this.btnHesabatlar.TabIndex = 14;
             this.btnHesabatlar.Text = "Hesabatlar";
             this.btnHesabatlar.UseVisualStyleBackColor = false;
@@ -258,88 +259,80 @@
             this.btnKateqoriyalar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnKateqoriyalar.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnKateqoriyalar.ForeColor = System.Drawing.Color.White;
-            this.btnKateqoriyalar.Location = new System.Drawing.Point(879, 12);
+            this.btnKateqoriyalar.Location = new System.Drawing.Point(377, 571);
             this.btnKateqoriyalar.Name = "btnKateqoriyalar";
-            this.btnKateqoriyalar.Size = new System.Drawing.Size(120, 34);
+            this.btnKateqoriyalar.Size = new System.Drawing.Size(113, 40);
             this.btnKateqoriyalar.TabIndex = 15;
-            this.btnKateqoriyalar.Text = "Kateqoriyalar";
+            this.btnKateqoriyalar.Text = "Kateqoriya";
             this.btnKateqoriyalar.UseVisualStyleBackColor = false;
             this.btnKateqoriyalar.Click += new System.EventHandler(this.btnKateqoriyalar_Click);
             // 
-            // btnGeriQaytarma
+            // picProductBasket
             // 
-            this.btnGeriQaytarma.BackColor = System.Drawing.Color.DarkOrange;
-            this.btnGeriQaytarma.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnGeriQaytarma.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold);
-            this.btnGeriQaytarma.ForeColor = System.Drawing.Color.White;
-            this.btnGeriQaytarma.Location = new System.Drawing.Point(1005, 12);
-            this.btnGeriQaytarma.Name = "btnGeriQaytarma";
-            this.btnGeriQaytarma.Size = new System.Drawing.Size(85, 34);
-            this.btnGeriQaytarma.TabIndex = 17;
-            this.btnGeriQaytarma.Text = "Qaytar";
-            this.btnGeriQaytarma.UseVisualStyleBackColor = false;
-            this.btnGeriQaytarma.Click += new System.EventHandler(this.btnGeriQaytarma_Click);
+            this.picProductBasket.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picProductBasket.Location = new System.Drawing.Point(957, 85);
+            this.picProductBasket.Name = "picProductBasket";
+            this.picProductBasket.Size = new System.Drawing.Size(160, 160);
+            this.picProductBasket.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picProductBasket.TabIndex = 16;
+            this.picProductBasket.TabStop = false;
             // 
-            // panelDailySummary
+            // btnDecreaseQty
             // 
-            this.panelDailySummary.BackColor = System.Drawing.Color.LightSteelBlue;
-            this.panelDailySummary.Controls.Add(this.lblTodayProfit);
-            this.panelDailySummary.Controls.Add(this.label5);
-            this.panelDailySummary.Controls.Add(this.lblTodayRevenue);
-            this.panelDailySummary.Controls.Add(this.label4);
-            this.panelDailySummary.Location = new System.Drawing.Point(590, 521);
-            this.panelDailySummary.Name = "panelDailySummary";
-            this.panelDailySummary.Size = new System.Drawing.Size(254, 90);
-            this.panelDailySummary.TabIndex = 16;
+            this.btnDecreaseQty.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(193)))), ((int)(((byte)(7)))));
+            this.btnDecreaseQty.Enabled = false;
+            this.btnDecreaseQty.FlatAppearance.BorderSize = 0;
+            this.btnDecreaseQty.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDecreaseQty.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDecreaseQty.ForeColor = System.Drawing.Color.White;
+            this.btnDecreaseQty.Location = new System.Drawing.Point(505, 426);
+            this.btnDecreaseQty.Name = "btnDecreaseQty";
+            this.btnDecreaseQty.Size = new System.Drawing.Size(40, 40);
+            this.btnDecreaseQty.TabIndex = 17;
+            this.btnDecreaseQty.Text = "-";
+            this.btnDecreaseQty.UseVisualStyleBackColor = false;
+            this.btnDecreaseQty.Click += new System.EventHandler(this.btnDecreaseQty_Click);
             // 
-            // lblTodayProfit
+            // btnIncreaseQty
             // 
-            this.lblTodayProfit.AutoSize = true;
-            this.lblTodayProfit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTodayProfit.ForeColor = System.Drawing.Color.Green;
-            this.lblTodayProfit.Location = new System.Drawing.Point(150, 55);
-            this.lblTodayProfit.Name = "lblTodayProfit";
-            this.lblTodayProfit.Size = new System.Drawing.Size(64, 20);
-            this.lblTodayProfit.TabIndex = 3;
-            this.lblTodayProfit.Text = "0.00 ₼";
+            this.btnIncreaseQty.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(167)))), ((int)(((byte)(69)))));
+            this.btnIncreaseQty.Enabled = false;
+            this.btnIncreaseQty.FlatAppearance.BorderSize = 0;
+            this.btnIncreaseQty.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnIncreaseQty.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnIncreaseQty.ForeColor = System.Drawing.Color.White;
+            this.btnIncreaseQty.Location = new System.Drawing.Point(551, 426);
+            this.btnIncreaseQty.Name = "btnIncreaseQty";
+            this.btnIncreaseQty.Size = new System.Drawing.Size(40, 40);
+            this.btnIncreaseQty.TabIndex = 18;
+            this.btnIncreaseQty.Text = "+";
+            this.btnIncreaseQty.UseVisualStyleBackColor = false;
+            this.btnIncreaseQty.Click += new System.EventHandler(this.btnIncreaseQty_Click);
             // 
-            // label5
+            // btnRemoveFromBasket
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(13, 55);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(157, 20);
-            this.label5.TabIndex = 2;
-            this.label5.Text = "Bugünkü Qazanc:";
-            // 
-            // lblTodayRevenue
-            // 
-            this.lblTodayRevenue.AutoSize = true;
-            this.lblTodayRevenue.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTodayRevenue.Location = new System.Drawing.Point(150, 15);
-            this.lblTodayRevenue.Name = "lblTodayRevenue";
-            this.lblTodayRevenue.Size = new System.Drawing.Size(64, 20);
-            this.lblTodayRevenue.TabIndex = 1;
-            this.lblTodayRevenue.Text = "0.00 ₼";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(13, 15);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(134, 20);
-            this.label4.TabIndex = 0;
-            this.label4.Text = "Bugünkü Gəlir:";
+            this.btnRemoveFromBasket.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(53)))), ((int)(((byte)(69)))));
+            this.btnRemoveFromBasket.Enabled = false;
+            this.btnRemoveFromBasket.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRemoveFromBasket.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRemoveFromBasket.ForeColor = System.Drawing.Color.White;
+            this.btnRemoveFromBasket.Location = new System.Drawing.Point(612, 426);
+            this.btnRemoveFromBasket.Name = "btnRemoveFromBasket";
+            this.btnRemoveFromBasket.Size = new System.Drawing.Size(117, 40);
+            this.btnRemoveFromBasket.TabIndex = 19;
+            this.btnRemoveFromBasket.Text = "Sil";
+            this.btnRemoveFromBasket.UseVisualStyleBackColor = false;
+            this.btnRemoveFromBasket.Click += new System.EventHandler(this.btnRemoveFromBasket_Click);
             // 
             // frmPOS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1102, 623);
-            this.Controls.Add(this.panelDailySummary);
-            this.Controls.Add(this.btnGeriQaytarma);
+            this.ClientSize = new System.Drawing.Size(1129, 623);
+            this.Controls.Add(this.btnRemoveFromBasket);
+            this.Controls.Add(this.btnIncreaseQty);
+            this.Controls.Add(this.btnDecreaseQty);
+            this.Controls.Add(this.picProductBasket);
             this.Controls.Add(this.btnKateqoriyalar);
             this.Controls.Add(this.btnHesabatlar);
             this.Controls.Add(this.label3);
@@ -365,11 +358,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvBasket)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.panelDailySummary.ResumeLayout(false);
-            this.panelDailySummary.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picProductBasket)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
@@ -392,11 +383,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnHesabatlar;
         private System.Windows.Forms.Button btnKateqoriyalar;
-        private System.Windows.Forms.Button btnGeriQaytarma;
-        private System.Windows.Forms.Panel panelDailySummary;
-        private System.Windows.Forms.Label lblTodayProfit;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label lblTodayRevenue;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.PictureBox picProductBasket;
+        private System.Windows.Forms.Button btnDecreaseQty;
+        private System.Windows.Forms.Button btnIncreaseQty;
+        private System.Windows.Forms.Button btnRemoveFromBasket;
     }
 }
