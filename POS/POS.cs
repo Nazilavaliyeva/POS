@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -8,6 +10,10 @@ namespace POS
 {
     public partial class frmPOS : Form
     {
+        private readonly string productsFilePath = "products.txt";
+        private readonly string categoriesFilePath = "categories.txt";
+        private readonly string salesFilePath = "sales.txt";
+
         private DataTable productTable = new DataTable();
         private DataTable basketTable = new DataTable();
 
@@ -25,6 +31,14 @@ namespace POS
 
         private void SetupDataTables()
         {
+            productTable.Columns.Add("Barkod", typeof(string));
+            productTable.Columns.Add("Ad", typeof(string));
+            productTable.Columns.Add("Miqdar", typeof(int));
+            productTable.Columns.Add("Satış Qiyməti", typeof(decimal));
+            productTable.Columns.Add("Kateqoriya", typeof(string));
+            productTable.Columns.Add("Min. Stok", typeof(int));
+            productTable.Columns.Add("Şəkil Yolu", typeof(string));
+
             dgvProducts.DataSource = productTable;
             dgvProducts.ReadOnly = true;
             dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -37,17 +51,30 @@ namespace POS
             basketTable.Columns.Add("Miqdar", typeof(int));
             basketTable.Columns.Add("Qiymət", typeof(decimal));
             basketTable.Columns.Add("Toplam", typeof(decimal), "Miqdar * Qiymət");
+
             dgvBasket.DataSource = basketTable;
+            dgvBasket.ReadOnly = true;
+            dgvBasket.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvBasket.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         private void LoadProducts()
         {
+            productTable.Clear();
+            if (!File.Exists(productsFilePath)) return;
+
             try
             {
-                productTable = DataAccess.GetProductsForDisplay();
-                dgvProducts.DataSource = productTable;
-                if (dgvProducts.Columns.Contains("MinStock"))
-                    dgvProducts.Columns["MinStock"].Visible = false;
+                var encryptedLines = File.ReadAllLines(productsFilePath);
+                foreach (var encryptedLine in encryptedLines)
+                {
+                    string line = EncryptionHelper.Decrypt(encryptedLine);
+                    string[] parts = line.Split('|');
+                    if (parts.Length == 11)
+                    {
+                        productTable.Rows.Add(parts[0], parts[1], int.Parse(parts[3]), decimal.Parse(parts[8]), parts[9], int.Parse(parts[4]), parts[10]);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -59,10 +86,10 @@ namespace POS
         {
             foreach (DataGridViewRow row in dgvProducts.Rows)
             {
-                if (row.Cells["Miqdar"].Value == null || row.Cells["MinStock"].Value == null) continue;
+                if (row.Cells["Miqdar"].Value == null || row.Cells["Min. Stok"].Value == null) continue;
 
                 int miqdar = Convert.ToInt32(row.Cells["Miqdar"].Value);
-                int minStok = Convert.ToInt32(row.Cells["MinStock"].Value);
+                int minStok = Convert.ToInt32(row.Cells["Min. Stok"].Value);
 
                 if (miqdar <= minStok)
                 {
@@ -83,10 +110,11 @@ namespace POS
             {
                 cmbKateqoriyaFilter.Items.Clear();
                 cmbKateqoriyaFilter.Items.Add("Bütün Kateqoriyalar");
-                var categories = DataAccess.GetAllCategories();
-                foreach (var cat in categories)
+                if (File.Exists(categoriesFilePath))
                 {
-                    cmbKateqoriyaFilter.Items.Add(cat.Name);
+                    var encryptedLines = File.ReadAllLines(categoriesFilePath);
+                    var decryptedLines = encryptedLines.Select(line => EncryptionHelper.Decrypt(line));
+                    cmbKateqoriyaFilter.Items.AddRange(decryptedLines.ToArray());
                 }
                 cmbKateqoriyaFilter.SelectedIndex = 0;
             }
@@ -109,20 +137,38 @@ namespace POS
 
         private void btnYenile_Click(object sender, EventArgs e)
         {
+            EditSelectedProduct();
+        }
+
+        private void EditSelectedProduct()
+        {
             if (dgvProducts.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Redaktə etmək üçün bir məhsul seçin.", "Xəbərdarlıq", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Yeniləmək üçün bir məhsul seçin.", "Xəbərdarlıq", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            string selectedBarcode = dgvProducts.SelectedRows[0].Cells["Barkod"].Value.ToString();
-            using (Frm_ProductDetails updateForm = new Frm_ProductDetails(selectedBarcode))
+            try
             {
-                if (updateForm.ShowDialog() == DialogResult.OK)
+                string selectedBarcode = dgvProducts.SelectedRows[0].Cells["Barkod"].Value.ToString();
+
+                var encryptedLines = File.ReadAllLines(productsFilePath);
+                string encryptedProductLine = encryptedLines.FirstOrDefault(line => EncryptionHelper.Decrypt(line).Split('|')[0] == selectedBarcode);
+
+                if (encryptedProductLine != null)
                 {
-                    LoadProducts();
-                    FilterProducts();
+                    using (Frm_ProductDetails updateForm = new Frm_ProductDetails(EncryptionHelper.Decrypt(encryptedProductLine).Split('|')))
+                    {
+                        if (updateForm.ShowDialog() == DialogResult.OK)
+                        {
+                            LoadProducts();
+                        }
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Məhsul məlumatlarını açarkən xəta baş verdi: {ex.Message}");
             }
         }
 
@@ -139,7 +185,11 @@ namespace POS
                 try
                 {
                     string selectedBarcode = dgvProducts.SelectedRows[0].Cells["Barkod"].Value.ToString();
-                    DataAccess.DeleteProduct(selectedBarcode);
+
+                    var encryptedLines = File.ReadAllLines(productsFilePath).ToList();
+                    encryptedLines.RemoveAll(encryptedLine => EncryptionHelper.Decrypt(encryptedLine).Split('|')[0] == selectedBarcode);
+                    File.WriteAllLines(productsFilePath, encryptedLines);
+
                     LoadProducts();
                 }
                 catch (Exception ex)
@@ -153,8 +203,8 @@ namespace POS
         {
             if (e.RowIndex >= 0)
             {
-                DataGridViewRow row = dgvProducts.Rows[e.RowIndex];
-                string barkod = row.Cells["Barkod"].Value.ToString();
+                DataRowView selectedRow = (DataRowView)dgvProducts.Rows[e.RowIndex].DataBoundItem;
+                string barkod = selectedRow["Barkod"].ToString();
                 AddToBasket(barkod);
             }
         }
@@ -166,21 +216,35 @@ namespace POS
 
             if (!string.IsNullOrEmpty(txtAxtaris.Text))
             {
-                string safeSearch = txtAxtaris.Text.Replace("'", "''");
-                filter += $"Ad LIKE '%{safeSearch}%' OR Barkod LIKE '%{safeSearch}%'";
+                filter += $"Ad LIKE '%{txtAxtaris.Text}%'";
             }
 
             if (cmbKateqoriyaFilter.SelectedIndex > 0)
             {
                 if (!string.IsNullOrEmpty(filter)) filter += " AND ";
-                string safeCategory = cmbKateqoriyaFilter.SelectedItem.ToString().Replace("'", "''");
-                filter += $"Kateqoriya = '{safeCategory}'";
+                filter += $"Kateqoriya = '{cmbKateqoriyaFilter.SelectedItem}'";
             }
+
             dv.RowFilter = filter;
         }
 
-        private void txtAxtaris_TextChanged(object sender, EventArgs e) => FilterProducts();
-        private void cmbKateqoriyaFilter_SelectedIndexChanged(object sender, EventArgs e) => FilterProducts();
+        private void txtAxtaris_TextChanged(object sender, EventArgs e)
+        {
+            FilterProducts();
+        }
+
+        private void cmbKateqoriyaFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            FilterProducts();
+        }
+
+        private void btnHesabatlar_Click(object sender, EventArgs e)
+        {
+            using (Frm_Reports reportsForm = new Frm_Reports())
+            {
+                reportsForm.ShowDialog();
+            }
+        }
 
         private void btnKateqoriyalar_Click(object sender, EventArgs e)
         {
@@ -194,19 +258,30 @@ namespace POS
             }
         }
 
+        private void btnGeriQaytarma_Click(object sender, EventArgs e)
+        {
+            using (Frm_ReturnProduct returnForm = new Frm_ReturnProduct())
+            {
+                if (returnForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadProducts();
+                }
+            }
+        }
+
         private void AddToBasket(string barkod)
         {
-            DataRow productRow = productTable.AsEnumerable().FirstOrDefault(r => r.Field<string>("Barkod") == barkod);
+            DataRow productRow = productTable.Select($"Barkod = '{barkod}'").FirstOrDefault();
             if (productRow == null) return;
 
-            int anbarMiqdari = productRow.Field<int>("Miqdar");
+            int anbarMiqdari = (int)productRow["Miqdar"];
             if (anbarMiqdari <= 0)
             {
-                MessageBox.Show("Bu məhsul anbarda bitib.", "Stok Xətası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Bu məhsul anbarada bitib.", "Stok Xətası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            DataRow basketRow = basketTable.AsEnumerable().FirstOrDefault(r => r.Field<string>("Barkod") == barkod);
+            DataRow basketRow = basketTable.Select($"Barkod = '{barkod}'").FirstOrDefault();
 
             if (basketRow != null)
             {
@@ -220,24 +295,34 @@ namespace POS
             }
             else
             {
-                basketTable.Rows.Add(barkod, productRow["Ad"], 1, productRow["Satış Qiyməti"]);
+                string ad = productRow["Ad"].ToString();
+                decimal satisQiymeti = (decimal)productRow["Satış Qiyməti"];
+                basketTable.Rows.Add(barkod, ad, 1, satisQiymeti);
             }
+
             UpdateTotal();
         }
 
         private void UpdateTotal()
         {
-            decimal yekunMebleg = 0;
+            decimal umumiMebleg = 0;
             if (basketTable.Rows.Count > 0)
             {
-                yekunMebleg = Convert.ToDecimal(basketTable.Compute("SUM(Toplam)", string.Empty));
+                umumiMebleg = (decimal)basketTable.Compute("SUM(Toplam)", string.Empty);
             }
+
+            decimal endirimFaizi = numDiscount.Value;
+            decimal endirimMeblegi = umumiMebleg * (endirimFaizi / 100);
+            decimal yekunMebleg = umumiMebleg - endirimMeblegi;
+
             lblYekunMebleg.Text = $"{yekunMebleg:F2} ₼";
         }
+
 
         private void btnSebetiTemizle_Click(object sender, EventArgs e)
         {
             basketTable.Clear();
+            numDiscount.Value = 0;
             UpdateTotal();
         }
 
@@ -251,19 +336,48 @@ namespace POS
 
             try
             {
+                List<string> encryptedProductLines = File.ReadAllLines(productsFilePath).ToList();
+                List<string> decryptedProductLines = encryptedProductLines.Select(line => EncryptionHelper.Decrypt(line)).ToList();
+
+                string salesRecord = "";
                 string transactionId = Guid.NewGuid().ToString().Substring(0, 8);
-                DataAccess.ProcessSale(basketTable.Copy(), transactionId);
+                DateTime saleDate = DateTime.Now;
+                string paymentMethod = rbCash.Checked ? "Nəğd" : "Kart";
+                decimal discountPercentage = numDiscount.Value;
+
+                foreach (DataRow row in basketTable.Rows)
+                {
+                    string barkod = row["Barkod"].ToString();
+                    int satilanMiqdar = (int)row["Miqdar"];
+
+                    int index = decryptedProductLines.FindIndex(line => line.Split('|')[0] == barkod);
+                    if (index != -1)
+                    {
+                        string[] parts = decryptedProductLines[index].Split('|');
+                        parts[3] = (int.Parse(parts[3]) - satilanMiqdar).ToString();
+                        decryptedProductLines[index] = string.Join("|", parts);
+                    }
+
+                    string singleSaleInfo = $"{transactionId}|{saleDate:yyyy-MM-dd HH:mm:ss}|{barkod}|{row["Ad"]}|{satilanMiqdar}|{row["Qiymət"]}|{paymentMethod}|{discountPercentage}";
+                    salesRecord += EncryptionHelper.Encrypt(singleSaleInfo) + Environment.NewLine;
+                }
+
+                var reEncryptedProductLines = decryptedProductLines.Select(line => EncryptionHelper.Encrypt(line));
+                File.WriteAllLines(productsFilePath, reEncryptedProductLines);
+
+                File.AppendAllText(salesFilePath, salesRecord);
 
                 MessageBox.Show("Satış uğurla tamamlandı!", "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                using (Frm_Receipt receiptForm = new Frm_Receipt(transactionId, DateTime.Now, basketTable.Copy()))
+                using (Frm_Receipt receiptForm = new Frm_Receipt(transactionId, saleDate, basketTable, discountPercentage, paymentMethod))
                 {
                     receiptForm.ShowDialog();
                 }
 
                 basketTable.Clear();
+                numDiscount.Value = 0;
                 UpdateTotal();
-                LoadProducts(); // Stok yeniləndiyi üçün məhsul siyahısını yeniləyirik
+                LoadProducts();
             }
             catch (Exception ex)
             {
@@ -271,18 +385,90 @@ namespace POS
             }
         }
 
-        private void btnHesabatlar_Click(object sender, EventArgs e)
+        private void dgvBasket_SelectionChanged(object sender, EventArgs e)
         {
-            Frm_Reports reportsForm = new Frm_Reports();
-            reportsForm.ShowDialog();
-        }
-        private void btnGeriQaytarma_Click(object sender, EventArgs e)
-        {
-            Frm_ReturnProduct returnForm = new Frm_ReturnProduct();
-            if (returnForm.ShowDialog() == DialogResult.OK)
+            bool isRowSelected = dgvBasket.SelectedRows.Count > 0;
+            btnIncreaseQty.Enabled = isRowSelected;
+            btnDecreaseQty.Enabled = isRowSelected;
+            btnRemoveFromBasket.Enabled = isRowSelected;
+
+            if (isRowSelected)
             {
-                LoadProducts(); // Stok yeniləndiyi üçün məhsul siyahısını yeniləyirik
+                string barkod = dgvBasket.SelectedRows[0].Cells["Barkod"].Value.ToString();
+                DataRow productRow = productTable.Select($"Barkod = '{barkod}'").FirstOrDefault();
+                if (productRow != null)
+                {
+                    string imagePath = productRow["Şəkil Yolu"].ToString();
+                    if (File.Exists(imagePath))
+                    {
+                        picProductBasket.ImageLocation = imagePath;
+                    }
+                    else
+                    {
+                        picProductBasket.Image = null;
+                    }
+                }
             }
+            else
+            {
+                picProductBasket.Image = null;
+            }
+        }
+
+        private void btnIncreaseQty_Click(object sender, EventArgs e)
+        {
+            if (dgvBasket.SelectedRows.Count == 0) return;
+
+            DataRowView selectedRowView = (DataRowView)dgvBasket.SelectedRows[0].DataBoundItem;
+            DataRow basketRow = selectedRowView.Row;
+            string barkod = basketRow["Barkod"].ToString();
+
+            DataRow productRow = productTable.Select($"Barkod = '{barkod}'").FirstOrDefault();
+            int anbarMiqdari = (int)productRow["Miqdar"];
+            int yeniMiqdar = (int)basketRow["Miqdar"] + 1;
+
+            if (yeniMiqdar > anbarMiqdari)
+            {
+                MessageBox.Show($"Anbarda yalnız {anbarMiqdari} ədəd var.", "Stok Xətası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            basketRow["Miqdar"] = yeniMiqdar;
+            UpdateTotal();
+        }
+
+        private void btnDecreaseQty_Click(object sender, EventArgs e)
+        {
+            if (dgvBasket.SelectedRows.Count == 0) return;
+
+            DataRowView selectedRowView = (DataRowView)dgvBasket.SelectedRows[0].DataBoundItem;
+            DataRow basketRow = selectedRowView.Row;
+
+            int yeniMiqdar = (int)basketRow["Miqdar"] - 1;
+
+            if (yeniMiqdar > 0)
+            {
+                basketRow["Miqdar"] = yeniMiqdar;
+            }
+            else
+            {
+                basketRow.Delete();
+            }
+            UpdateTotal();
+        }
+
+        private void btnRemoveFromBasket_Click(object sender, EventArgs e)
+        {
+            if (dgvBasket.SelectedRows.Count == 0) return;
+
+            DataRowView selectedRowView = (DataRowView)dgvBasket.SelectedRows[0].DataBoundItem;
+            selectedRowView.Row.Delete();
+            UpdateTotal();
+        }
+
+        private void numDiscount_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateTotal();
         }
     }
 }

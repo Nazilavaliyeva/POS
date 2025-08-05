@@ -2,41 +2,12 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Configuration;
 
 public static class EncryptionHelper
 {
-    private static readonly byte[] Key;
-    private static readonly byte[] IV;
+    private static readonly byte[] Key = Encoding.UTF8.GetBytes("Bu32ByteUzunluqluBirAcardir1234");
+    private static readonly byte[] IV = Encoding.UTF8.GetBytes("Bu16ByteIVdir123");
 
-    static EncryptionHelper()
-    {
-        string keyString = ConfigurationManager.AppSettings["EncryptionKey"];
-        string ivString = ConfigurationManager.AppSettings["EncryptionIV"];
-
-        if (string.IsNullOrEmpty(keyString))
-        {
-            throw new ConfigurationErrorsException("Xəta: App.config faylında 'EncryptionKey' tapılmadı və ya dəyəri boşdur.");
-        }
-        if (string.IsNullOrEmpty(ivString))
-        {
-            throw new ConfigurationErrorsException("Xəta: App.config faylında 'EncryptionIV' tapılmadı və ya dəyəri boşdur.");
-        }
-
-        Key = Encoding.UTF8.GetBytes(keyString);
-        IV = Encoding.UTF8.GetBytes(ivString);
-
-        if (Key.Length != 32)
-        {
-            throw new ConfigurationErrorsException("'EncryptionKey' dəyəri App.config faylında 32 simvol olmalıdır.");
-        }
-        if (IV.Length != 16)
-        {
-            throw new ConfigurationErrorsException("'EncryptionIV' dəyəri App.config faylında 16 simvol olmalıdır.");
-        }
-    }
-
-    // --- BU METODLARI GERİ QAYTARIRIQ ---
     public static string Encrypt(string plainText)
     {
         if (string.IsNullOrEmpty(plainText))
@@ -46,7 +17,6 @@ public static class EncryptionHelper
         {
             aesAlg.Key = Key;
             aesAlg.IV = IV;
-
             ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
 
             using (MemoryStream msEncrypt = new MemoryStream())
@@ -67,14 +37,12 @@ public static class EncryptionHelper
     {
         if (string.IsNullOrEmpty(cipherText))
             return cipherText;
-
         try
         {
             using (Aes aesAlg = Aes.Create())
             {
                 aesAlg.Key = Key;
                 aesAlg.IV = IV;
-
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
                 byte[] cipherBytes = Convert.FromBase64String(cipherText);
 
@@ -90,7 +58,9 @@ public static class EncryptionHelper
                 }
             }
         }
-        catch (FormatException) { return cipherText; }
-        catch (CryptographicException) { return cipherText; }
+        catch (FormatException)
+        {
+            return cipherText;
+        }
     }
 }

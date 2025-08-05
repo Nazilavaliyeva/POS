@@ -30,6 +30,12 @@
             this.btnBagla = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.lblSatisID = new System.Windows.Forms.Label();
+            this.lblEndirim = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.lblUmumiMebleg = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.lblOdenisNovu = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -46,7 +52,7 @@
             // 
             this.lblTarix.AutoSize = true;
             this.lblTarix.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTarix.Location = new System.Drawing.Point(82, 90);
+            this.lblTarix.Location = new System.Drawing.Point(132, 90);
             this.lblTarix.Name = "lblTarix";
             this.lblTarix.Size = new System.Drawing.Size(41, 18);
             this.lblTarix.TabIndex = 1;
@@ -70,9 +76,9 @@
             this.columnHeader3,
             this.columnHeader4});
             this.lvSatisDetallari.HideSelection = false;
-            this.lvSatisDetallari.Location = new System.Drawing.Point(15, 127);
+            this.lvSatisDetallari.Location = new System.Drawing.Point(15, 155);
             this.lvSatisDetallari.Name = "lvSatisDetallari";
-            this.lvSatisDetallari.Size = new System.Drawing.Size(416, 281);
+            this.lvSatisDetallari.Size = new System.Drawing.Size(416, 253);
             this.lvSatisDetallari.TabIndex = 3;
             this.lvSatisDetallari.UseCompatibleStateImageBehavior = false;
             this.lvSatisDetallari.View = System.Windows.Forms.View.Details;
@@ -101,7 +107,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(10, 427);
+            this.label4.Location = new System.Drawing.Point(10, 485);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(166, 25);
             this.label4.TabIndex = 4;
@@ -110,7 +116,7 @@
             // lblYekunMebleg
             // 
             this.lblYekunMebleg.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblYekunMebleg.Location = new System.Drawing.Point(279, 427);
+            this.lblYekunMebleg.Location = new System.Drawing.Point(279, 485);
             this.lblYekunMebleg.Name = "lblYekunMebleg";
             this.lblYekunMebleg.Size = new System.Drawing.Size(152, 25);
             this.lblYekunMebleg.TabIndex = 5;
@@ -124,7 +130,7 @@
             this.btnBagla.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBagla.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnBagla.ForeColor = System.Drawing.Color.White;
-            this.btnBagla.Location = new System.Drawing.Point(164, 469);
+            this.btnBagla.Location = new System.Drawing.Point(156, 529);
             this.btnBagla.Name = "btnBagla";
             this.btnBagla.Size = new System.Drawing.Size(132, 40);
             this.btnBagla.TabIndex = 12;
@@ -145,18 +151,85 @@
             // 
             this.lblSatisID.AutoSize = true;
             this.lblSatisID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSatisID.Location = new System.Drawing.Point(82, 63);
+            this.lblSatisID.Location = new System.Drawing.Point(132, 63);
             this.lblSatisID.Name = "lblSatisID";
             this.lblSatisID.Size = new System.Drawing.Size(22, 18);
             this.lblSatisID.TabIndex = 13;
             this.lblSatisID.Text = "ID";
+            // 
+            // lblEndirim
+            // 
+            this.lblEndirim.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEndirim.ForeColor = System.Drawing.Color.Red;
+            this.lblEndirim.Location = new System.Drawing.Point(279, 451);
+            this.lblEndirim.Name = "lblEndirim";
+            this.lblEndirim.Size = new System.Drawing.Size(152, 25);
+            this.lblEndirim.TabIndex = 16;
+            this.lblEndirim.Text = "- 0.00 ₼";
+            this.lblEndirim.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(11, 451);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(71, 20);
+            this.label6.TabIndex = 15;
+            this.label6.Text = "Endirim:";
+            // 
+            // lblUmumiMebleg
+            // 
+            this.lblUmumiMebleg.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUmumiMebleg.Location = new System.Drawing.Point(279, 422);
+            this.lblUmumiMebleg.Name = "lblUmumiMebleg";
+            this.lblUmumiMebleg.Size = new System.Drawing.Size(152, 25);
+            this.lblUmumiMebleg.TabIndex = 18;
+            this.lblUmumiMebleg.Text = "0.00 ₼";
+            this.lblUmumiMebleg.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(11, 422);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(124, 20);
+            this.label7.TabIndex = 17;
+            this.label7.Text = "Ümumi Məbləğ:";
+            // 
+            // lblOdenisNovu
+            // 
+            this.lblOdenisNovu.AutoSize = true;
+            this.lblOdenisNovu.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblOdenisNovu.Location = new System.Drawing.Point(132, 117);
+            this.lblOdenisNovu.Name = "lblOdenisNovu";
+            this.lblOdenisNovu.Size = new System.Drawing.Size(43, 18);
+            this.lblOdenisNovu.TabIndex = 20;
+            this.lblOdenisNovu.Text = "Növü";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(12, 117);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(114, 18);
+            this.label8.TabIndex = 19;
+            this.label8.Text = "Ödəniş Növü:";
             // 
             // Frm_Receipt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(443, 521);
+            this.ClientSize = new System.Drawing.Size(443, 581);
+            this.Controls.Add(this.lblOdenisNovu);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.lblUmumiMebleg);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.lblEndirim);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lblSatisID);
             this.Controls.Add(this.btnBagla);
@@ -174,6 +247,7 @@
             this.Text = "Qəbz";
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -191,5 +265,11 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.Label lblEndirim;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblUmumiMebleg;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label lblOdenisNovu;
+        private System.Windows.Forms.Label label8;
     }
 }

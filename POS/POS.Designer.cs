@@ -40,10 +40,21 @@
             this.btnDecreaseQty = new System.Windows.Forms.Button();
             this.btnIncreaseQty = new System.Windows.Forms.Button();
             this.btnRemoveFromBasket = new System.Windows.Forms.Button();
+            this.btnGeriQaytarma = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.numDiscount = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbCard = new System.Windows.Forms.RadioButton();
+            this.rbCash = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBasket)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picProductBasket)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numDiscount)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvProducts
@@ -324,11 +335,106 @@
             this.btnRemoveFromBasket.UseVisualStyleBackColor = false;
             this.btnRemoveFromBasket.Click += new System.EventHandler(this.btnRemoveFromBasket_Click);
             // 
+            // btnGeriQaytarma
+            // 
+            this.btnGeriQaytarma.BackColor = System.Drawing.Color.DarkOrange;
+            this.btnGeriQaytarma.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGeriQaytarma.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGeriQaytarma.ForeColor = System.Drawing.Color.White;
+            this.btnGeriQaytarma.Location = new System.Drawing.Point(751, 12);
+            this.btnGeriQaytarma.Name = "btnGeriQaytarma";
+            this.btnGeriQaytarma.Size = new System.Drawing.Size(186, 40);
+            this.btnGeriQaytarma.TabIndex = 16;
+            this.btnGeriQaytarma.Text = "Məhsul Geri Qaytar";
+            this.btnGeriQaytarma.UseVisualStyleBackColor = false;
+            this.btnGeriQaytarma.Click += new System.EventHandler(this.btnGeriQaytarma_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.numDiscount);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Location = new System.Drawing.Point(505, 475);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(164, 66);
+            this.groupBox1.TabIndex = 20;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Endirim";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(125, 30);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(25, 20);
+            this.label5.TabIndex = 2;
+            this.label5.Text = "%";
+            // 
+            // numDiscount
+            // 
+            this.numDiscount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numDiscount.Location = new System.Drawing.Point(58, 28);
+            this.numDiscount.Name = "numDiscount";
+            this.numDiscount.Size = new System.Drawing.Size(64, 27);
+            this.numDiscount.TabIndex = 1;
+            this.numDiscount.ValueChanged += new System.EventHandler(this.numDiscount_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(6, 30);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(46, 20);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Ümumi:";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.rbCard);
+            this.groupBox2.Controls.Add(this.rbCash);
+            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox2.Location = new System.Drawing.Point(675, 475);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(201, 66);
+            this.groupBox2.TabIndex = 21;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Ödəniş Növü";
+            // 
+            // rbCard
+            // 
+            this.rbCard.AutoSize = true;
+            this.rbCard.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rbCard.Location = new System.Drawing.Point(111, 28);
+            this.rbCard.Name = "rbCard";
+            this.rbCard.Size = new System.Drawing.Size(61, 24);
+            this.rbCard.TabIndex = 1;
+            this.rbCard.Text = "Kart";
+            this.rbCard.UseVisualStyleBackColor = true;
+            // 
+            // rbCash
+            // 
+            this.rbCash.AutoSize = true;
+            this.rbCash.Checked = true;
+            this.rbCash.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rbCash.Location = new System.Drawing.Point(17, 28);
+            this.rbCash.Name = "rbCash";
+            this.rbCash.Size = new System.Drawing.Size(68, 24);
+            this.rbCash.TabIndex = 0;
+            this.rbCash.TabStop = true;
+            this.rbCash.Text = "Nəğd";
+            this.rbCash.UseVisualStyleBackColor = true;
+            // 
             // frmPOS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1129, 623);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.btnGeriQaytarma);
             this.Controls.Add(this.btnRemoveFromBasket);
             this.Controls.Add(this.btnIncreaseQty);
             this.Controls.Add(this.btnDecreaseQty);
@@ -359,8 +465,14 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picProductBasket)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numDiscount)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -387,5 +499,13 @@
         private System.Windows.Forms.Button btnDecreaseQty;
         private System.Windows.Forms.Button btnIncreaseQty;
         private System.Windows.Forms.Button btnRemoveFromBasket;
+        private System.Windows.Forms.Button btnGeriQaytarma;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown numDiscount;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton rbCard;
+        private System.Windows.Forms.RadioButton rbCash;
     }
 }
