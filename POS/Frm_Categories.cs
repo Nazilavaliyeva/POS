@@ -39,4 +39,15 @@ namespace POS
                     }
                 }
             }
-            catch (Exception
+            catch (Exception ex)
+            {
+                MessageBox.Show("xeta","xeta",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
+}

@@ -102,6 +102,7 @@ namespace POS
 
         private void btnYaddaSaxla_Click(object sender, EventArgs e)
         {
+            
             // Validasiya
             if (string.IsNullOrWhiteSpace(txtBarkod.Text) ||
                 string.IsNullOrWhiteSpace(txtMehsulAd.Text) ||

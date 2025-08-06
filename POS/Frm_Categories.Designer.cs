@@ -36,7 +36,6 @@
             this.lstCategories.Name = "lstCategories";
             this.lstCategories.Size = new System.Drawing.Size(278, 284);
             this.lstCategories.TabIndex = 0;
-            this.lstCategories.SelectedIndexChanged += new System.EventHandler(this.lstCategories_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -44,7 +43,7 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(313, 17);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(142, 20);
+            this.label1.Size = new System.Drawing.Size(137, 20);
             this.label1.TabIndex = 1;
             this.label1.Text = "Kateqoriya Adı:";
             // 
@@ -82,7 +81,6 @@
             this.btnUpdate.TabIndex = 4;
             this.btnUpdate.Text = "Yenilə";
             this.btnUpdate.UseVisualStyleBackColor = false;
-            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
             // 
             // btnDelete
             // 
@@ -96,7 +94,6 @@
             this.btnDelete.TabIndex = 5;
             this.btnDelete.Text = "Sil";
             this.btnDelete.UseVisualStyleBackColor = false;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // btnClose
             // 
@@ -118,7 +115,7 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(12, 17);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(193, 20);
+            this.label2.Size = new System.Drawing.Size(190, 20);
             this.label2.TabIndex = 7;
             this.label2.Text = "Mövcud Kateqoriyalar";
             // 
@@ -144,6 +141,7 @@
             this.Load += new System.EventHandler(this.Frm_Categories_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
