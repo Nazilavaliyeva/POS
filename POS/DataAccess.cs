@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Fayl: DataAccess.cs
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
@@ -6,28 +8,91 @@ using System.IO;
 
 namespace POS
 {
+    /// <summary>
+    /// Verilənlər bazası ilə bütün əməliyyatları (oxuma, yazma, yeniləmə, silmə) idarə edən statik sinif.
+    /// Bu sinif məlumatların mərkəzləşdirilmiş şəkildə idarə olunmasını təmin edir (Data Access Layer - DAL).
+    /// </summary>
     public static class DataAccess
     {
+        // Verilənlər bazası faylının proqramın qovluğunda yerləşməsini təmin edir.
         private static readonly string dbFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pos_database.sqlite");
+        // Verilənlər bazasına qoşulmaq üçün istifadə olunan qoşulma sətri (connection string).
         private static readonly string connectionString = $"Data Source={dbFilePath};Version=3;";
 
+        /// <summary>
+        /// Verilənlər bazasını və cədvəlləri ilkin hazırlayır. Tətbiq ilk dəfə işə düşəndə çağırılır.
+        /// Əgər verilənlər bazası faylı mövcud deyilsə, yenisini yaradır və bütün lazımi cədvəlləri qurur.
+        /// </summary>
         public static void InitializeDatabase()
         {
-            if (!File.Exists(dbFilePath)) SQLiteConnection.CreateFile(dbFilePath);
+            if (!File.Exists(dbFilePath))
+            {
+                SQLiteConnection.CreateFile(dbFilePath);
+            }
+
             using (var cnn = new SQLiteConnection(connectionString))
             {
                 cnn.Open();
+                // Bütün cədvəlləri yaratmaq üçün SQL sorğusu. "IF NOT EXISTS" mövcud cədvəllərin təkrar yaradılmasının qarşısını alır.
                 string sql = @"
-                CREATE TABLE IF NOT EXISTS Users (Username TEXT PRIMARY KEY, PasswordHash TEXT NOT NULL);
-                CREATE TABLE IF NOT EXISTS Categories (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL UNIQUE);
-                CREATE TABLE IF NOT EXISTS Products (Barcode TEXT PRIMARY KEY, Name TEXT NOT NULL, Description TEXT, Quantity INTEGER NOT NULL, MinStock INTEGER NOT NULL, Unit TEXT, PurchasePrice REAL NOT NULL, SalePrice REAL NOT NULL, ImagePath TEXT, CategoryId INTEGER, FOREIGN KEY (CategoryId) REFERENCES Categories (Id) ON DELETE SET NULL);
-                CREATE TABLE IF NOT EXISTS Sales (SaleId INTEGER PRIMARY KEY AUTOINCREMENT, TransactionId TEXT NOT NULL, SaleDate TEXT NOT NULL, ProductBarcode TEXT NOT NULL, ProductName TEXT NOT NULL, QuantitySold INTEGER NOT NULL, SalePrice REAL NOT NULL);
-                CREATE TABLE IF NOT EXISTS Returns (ReturnId INTEGER PRIMARY KEY AUTOINCREMENT, OriginalTransactionId TEXT NOT NULL, ReturnDate TEXT NOT NULL, ProductBarcode TEXT NOT NULL, ProductName TEXT NOT NULL, QuantityReturned INTEGER NOT NULL);";
-                using (var cmd = new SQLiteCommand(sql, cnn)) cmd.ExecuteNonQuery();
+                CREATE TABLE IF NOT EXISTS Users (
+                    Username TEXT PRIMARY KEY, 
+                    PasswordHash TEXT NOT NULL
+                );
+                
+                CREATE TABLE IF NOT EXISTS Categories (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    Name TEXT NOT NULL UNIQUE
+                );
+                
+                CREATE TABLE IF NOT EXISTS Products (
+                    Barcode TEXT PRIMARY KEY, 
+                    Name TEXT NOT NULL, 
+                    Description TEXT, 
+                    Quantity INTEGER NOT NULL, 
+                    MinStock INTEGER NOT NULL, 
+                    Unit TEXT, 
+                    PurchasePrice REAL NOT NULL, 
+                    SalePrice REAL NOT NULL, 
+                    ImagePath TEXT, 
+                    CategoryId INTEGER, 
+                    FOREIGN KEY (CategoryId) REFERENCES Categories (Id) ON DELETE SET NULL
+                );
+                
+                CREATE TABLE IF NOT EXISTS Sales (
+                    SaleId INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    TransactionId TEXT NOT NULL, 
+                    SaleDate TEXT NOT NULL, 
+                    ProductBarcode TEXT NOT NULL, 
+                    ProductName TEXT NOT NULL, 
+                    QuantitySold INTEGER NOT NULL, 
+                    SalePrice REAL NOT NULL,
+                    PaymentMethod TEXT 
+                );
+                
+                CREATE TABLE IF NOT EXISTS Returns (
+                    ReturnId INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    OriginalTransactionId TEXT NOT NULL, 
+                    ReturnDate TEXT NOT NULL, 
+                    ProductBarcode TEXT NOT NULL, 
+                    ProductName TEXT NOT NULL, 
+                    QuantityReturned INTEGER NOT NULL
+                );";
+
+                using (var cmd = new SQLiteCommand(sql, cnn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
-        #region User Methods
+        #region User Methods (İstifadəçi Metodları)
+
+        /// <summary>
+        /// Verilən istifadəçi adının bazada mövcud olub-olmadığını yoxlayır.
+        /// </summary>
+        /// <param name="username">Yoxlanılacaq istifadəçi adı.</param>
+        /// <returns>İstifadəçi mövcuddursa true, deyilsə false.</returns>
         public static bool UserExists(string username)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -41,6 +106,11 @@ namespace POS
                 }
             }
         }
+
+        /// <summary>
+        /// Verilənlər bazasına yeni istifadəçi əlavə edir.
+        /// </summary>
+        /// <param name="user">Əlavə ediləcək istifadəçi obyekti.</param>
         public static void AddUser(User user)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -55,6 +125,12 @@ namespace POS
                 }
             }
         }
+
+        /// <summary>
+        /// İstifadəçi adına görə istifadəçi məlumatlarını qaytarır.
+        /// </summary>
+        /// <param name="username">Axtarılan istifadəçi adı.</param>
+        /// <returns>User obyekti və ya tapılmasa null.</returns>
         public static User GetUser(string username)
         {
             User user = null;
@@ -78,7 +154,11 @@ namespace POS
         }
         #endregion
 
-        #region Category Methods
+        #region Category Methods (Kateqoriya Metodları)
+
+        /// <summary>
+        /// Bütün kateqoriyaları adlarına görə sıralanmış şəkildə qaytarır.
+        /// </summary>
         public static List<Category> GetAllCategories()
         {
             var list = new List<Category>();
@@ -90,12 +170,19 @@ namespace POS
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
-                        while (reader.Read()) list.Add(new Category { Id = Convert.ToInt32(reader["Id"]), Name = reader["Name"].ToString() });
+                        while (reader.Read())
+                        {
+                            list.Add(new Category { Id = Convert.ToInt32(reader["Id"]), Name = reader["Name"].ToString() });
+                        }
                     }
                 }
             }
             return list;
         }
+
+        /// <summary>
+        /// Verilənlər bazasına yeni kateqoriya əlavə edir.
+        /// </summary>
         public static void AddCategory(string name)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -109,6 +196,10 @@ namespace POS
                 }
             }
         }
+
+        /// <summary>
+        /// Mövcud kateqoriyanın adını yeniləyir.
+        /// </summary>
         public static void UpdateCategory(int id, string newName)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -123,6 +214,10 @@ namespace POS
                 }
             }
         }
+
+        /// <summary>
+        /// Kateqoriyanı silir.
+        /// </summary>
         public static void DeleteCategory(int id)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -136,6 +231,10 @@ namespace POS
                 }
             }
         }
+
+        /// <summary>
+        /// Kateqoriyanın hər hansı bir məhsulda istifadə olunub-olunmadığını yoxlayır.
+        /// </summary>
         public static bool IsCategoryInUse(int categoryId)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -151,7 +250,11 @@ namespace POS
         }
         #endregion
 
-        #region Product Methods
+        #region Product Methods (Məhsul Metodları)
+
+        /// <summary>
+        /// Məhsulları DataGridView-da göstərmək üçün DataTable formatında qaytarır.
+        /// </summary>
         public static DataTable GetProductsForDisplay()
         {
             DataTable dt = new DataTable();
@@ -169,6 +272,10 @@ namespace POS
             }
             return dt;
         }
+
+        /// <summary>
+        /// Barkoda görə məhsul məlumatlarını qaytarır.
+        /// </summary>
         public static Product GetProductByBarcode(string barcode)
         {
             Product product = null;
@@ -202,6 +309,10 @@ namespace POS
             }
             return product;
         }
+
+        /// <summary>
+        /// Verilənlər bazasına yeni məhsul əlavə edir.
+        /// </summary>
         public static void AddProduct(Product product)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -225,6 +336,10 @@ namespace POS
                 }
             }
         }
+
+        /// <summary>
+        /// Mövcud məhsulun məlumatlarını yeniləyir.
+        /// </summary>
         public static void UpdateProduct(Product product, string originalBarcode)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -252,6 +367,10 @@ namespace POS
                 }
             }
         }
+
+        /// <summary>
+        /// Məhsulu barkoduna görə silir.
+        /// </summary>
         public static void DeleteProduct(string barcode)
         {
             using (var cnn = new SQLiteConnection(connectionString))
@@ -267,8 +386,12 @@ namespace POS
         }
         #endregion
 
-        #region Sale and Return Methods
-        public static void ProcessSale(DataTable basket, string transactionId)
+        #region Sale and Return Methods (Satış və Qaytarma Metodları)
+
+        /// <summary>
+        /// Satış əməliyyatını həyata keçirir: satışı qeyd edir və anbarı yeniləyir.
+        /// </summary>
+        public static void ProcessSale(DataTable basket, string transactionId, string paymentMethod)
         {
             using (var cnn = new SQLiteConnection(connectionString))
             {
@@ -282,18 +405,21 @@ namespace POS
                             string barcode = row["Barkod"].ToString();
                             int quantitySold = Convert.ToInt32(row["Miqdar"]);
 
-                            string insertSaleSql = "INSERT INTO Sales (TransactionId, SaleDate, ProductBarcode, ProductName, QuantitySold, SalePrice) VALUES (@tid, @date, @barcode, @name, @qty, @price)";
+                            // Satış məlumatını `Sales` cədvəlinə daxil et
+                            string insertSaleSql = "INSERT INTO Sales (TransactionId, SaleDate, ProductBarcode, ProductName, QuantitySold, SalePrice, PaymentMethod) VALUES (@tid, @date, @barcode, @name, @qty, @price, @payment)";
                             using (var cmd = new SQLiteCommand(insertSaleSql, cnn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@tid", transactionId);
-                                cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("o"));
+                                cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("o")); // ISO 8601 formatı
                                 cmd.Parameters.AddWithValue("@barcode", barcode);
                                 cmd.Parameters.AddWithValue("@name", row["Ad"].ToString());
                                 cmd.Parameters.AddWithValue("@qty", quantitySold);
                                 cmd.Parameters.AddWithValue("@price", Convert.ToDecimal(row["Qiymət"]));
+                                cmd.Parameters.AddWithValue("@payment", paymentMethod);
                                 cmd.ExecuteNonQuery();
                             }
 
+                            // Anbardakı məhsul miqdarını azalt
                             string updateStockSql = "UPDATE Products SET Quantity = Quantity - @qty WHERE Barcode = @barcode";
                             using (var cmd = new SQLiteCommand(updateStockSql, cnn, transaction))
                             {
@@ -302,17 +428,20 @@ namespace POS
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        transaction.Commit();
+                        transaction.Commit(); // Bütün əməliyyatlar uğurlu olarsa, təsdiqlə
                     }
                     catch (Exception)
                     {
-                        transaction.Rollback();
-                        throw;
+                        transaction.Rollback(); // Xəta baş verərsə, bütün dəyişiklikləri geri al
+                        throw; // Xətanı yuxarıya ötür
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Verilən tarix aralığına görə satış hesabatını qaytarır.
+        /// </summary>
         public static DataTable GetSalesReport(DateTime startDate, DateTime endDate)
         {
             DataTable dt = new DataTable();
@@ -342,6 +471,9 @@ namespace POS
             return dt;
         }
 
+        /// <summary>
+        /// Satış ID-sinə (TransactionId) görə satışın detallarını qaytarır.
+        /// </summary>
         public static DataTable GetSaleDetailsByTransactionId(string transactionId)
         {
             DataTable dt = new DataTable();
@@ -365,6 +497,9 @@ namespace POS
             return dt;
         }
 
+        /// <summary>
+        /// Məhsulun geri qaytarılması əməliyyatını həyata keçirir.
+        /// </summary>
         public static void ProcessReturn(string originalTransactionId, string productBarcode, string productName, int quantityReturned)
         {
             using (var cnn = new SQLiteConnection(connectionString))
